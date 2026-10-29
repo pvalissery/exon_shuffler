@@ -76,15 +76,20 @@
 
             <!-- Controls -->
             <div class="bg-teal-50 rounded-xl shadow-sm border border-teal-200 p-5 flex flex-col items-center justify-center text-center">
-                <div class="mb-6">
+                <div class="mb-6 w-full">
                     <div class="w-20 h-20 mx-auto bg-teal-100 rounded-full flex items-center justify-center mb-3">
                         <svg class="w-10 h-10 text-teal-600 animate-spin-slow" style="animation: spin 8s linear infinite;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
                     </div>
                     <h3 class="font-bold text-teal-900">Recombination Engine</h3>
-                    <p class="text-sm text-teal-700 mt-2">Combine 2 to 4 random domains to synthesize a novel protein.</p>
+                    <p class="text-sm text-teal-700 mt-2 mb-4">Combine random domains to synthesize a novel protein.</p>
+                    
+                    <div class="w-full text-left px-2">
+                        <label for="domain-count" class="block text-sm font-bold text-teal-800 mb-1">Number of Domains: <span id="domain-count-display" class="text-teal-600">4</span></label>
+                        <input type="range" id="domain-count" min="2" max="10" value="4" class="w-full h-2 bg-teal-200 rounded-lg appearance-none cursor-pointer">
+                    </div>
                 </div>
                 <button id="shuffle-btn" class="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 px-4 rounded-lg shadow-md transition duration-200 transform hover:-translate-y-1 active:translate-y-0">
-                    Shuffle Domains
+                    Shuffle & Generate Protein
                 </button>
             </div>
         </div>
@@ -124,72 +129,17 @@
     </footer>
 
     <script>
-        // Data Structure: Protein Domains
-        const domains = [
-            {
-                id: 'SP',
-                name: 'Signal Peptide',
-                colorClass: 'bg-yellow-500',
-                textClass: 'text-yellow-900',
-                shortDesc: 'Targets protein to secretion pathway',
-                type: 'localization',
-                mechanism: 'directs the nascent peptide to the endoplasmic reticulum'
-            },
-            {
-                id: 'TM',
-                name: 'Transmembrane',
-                colorClass: 'bg-slate-700',
-                textClass: 'text-white',
-                shortDesc: 'Anchors protein in lipid bilayer',
-                type: 'localization',
-                mechanism: 'firmly embeds the protein within a cellular membrane'
-            },
-            {
-                id: 'KIN',
-                name: 'Kinase',
-                colorClass: 'bg-blue-600',
-                textClass: 'text-white',
-                shortDesc: 'Phosphorylates targets (Catalytic)',
-                type: 'catalytic',
-                mechanism: 'transfers phosphate groups to specific substrates to trigger cellular signaling'
-            },
-            {
-                id: 'SH2',
-                name: 'SH2 Domain',
-                colorClass: 'bg-purple-500',
-                textClass: 'text-white',
-                shortDesc: 'Binds phosphorylated tyrosine',
-                type: 'interaction',
-                mechanism: 'docks onto active (phosphorylated) signaling receptors'
-            },
-            {
-                id: 'SH3',
-                name: 'SH3 Domain',
-                colorClass: 'bg-emerald-500',
-                textClass: 'text-white',
-                shortDesc: 'Binds proline-rich sequences',
-                type: 'interaction',
-                mechanism: 'recruits other signaling molecules via proline-rich motifs'
-            },
-            {
-                id: 'ZF',
-                name: 'Zinc Finger',
-                colorClass: 'bg-pink-500',
-                textClass: 'text-white',
-                shortDesc: 'Binds DNA/RNA sequences',
-                type: 'interaction_nucleic',
-                mechanism: 'interacts directly with nucleic acids to regulate gene expression'
-            },
-            {
-                id: 'FN3',
-                name: 'Fibronectin III',
-                colorClass: 'bg-orange-500',
-                textClass: 'text-white',
-                shortDesc: 'Extracellular interaction module',
-                type: 'interaction_extracellular',
-                mechanism: 'mediates interactions within the extracellular matrix or between cells'
-            }
-        ];
+        // Data Structure: Hardcoded Protein Domains JSON
+        const rawDomains = [{"Accession": "IPR000001", "Domain_Name": "Kringle"}, {"Accession": "IPR000008", "Domain_Name": "C2 domain"}, {"Accession": "IPR000156", "Domain_Name": "Ran binding domain"}, {"Accession": "IPR000160", "Domain_Name": "GGDEF domain"}, {"Accession": "IPR000182", "Domain_Name": "GNAT domain"}, {"Accession": "IPR000209", "Domain_Name": "Peptidase S8/S53 domain"}, {"Accession": "IPR000210", "Domain_Name": "BTB/POZ domain"}, {"Accession": "IPR000232", "Domain_Name": "Heat shock factor (HSF)-type, DNA-binding"}, {"Accession": "IPR000253", "Domain_Name": "Forkhead-associated (FHA) domain"}, {"Accession": "IPR000254", "Domain_Name": "Cellulose-binding domain"}, {"Accession": "IPR000261", "Domain_Name": "EH domain"}, {"Accession": "IPR000270", "Domain_Name": "PB1 domain"}, {"Accession": "IPR000299", "Domain_Name": "FERM domain"}, {"Accession": "IPR000306", "Domain_Name": "FYVE zinc finger"}, {"Accession": "IPR000315", "Domain_Name": "B-box-type zinc finger"}, {"Accession": "IPR000327", "Domain_Name": "POU-specific domain"}, {"Accession": "IPR000409", "Domain_Name": "BEACH domain"}, {"Accession": "IPR000433", "Domain_Name": "Zinc finger, ZZ-type"}, {"Accession": "IPR000488", "Domain_Name": "Death domain"}, {"Accession": "IPR000504", "Domain_Name": "RNA recognition motif domain"}, {"Accession": "IPR000531", "Domain_Name": "TonB-dependent receptor-like, beta-barrel"}, {"Accession": "IPR000562", "Domain_Name": "Fibronectin type II domain"}, {"Accession": "IPR000569", "Domain_Name": "HECT domain"}, {"Accession": "IPR000595", "Domain_Name": "Cyclic nucleotide-binding domain"}, {"Accession": "IPR000719", "Domain_Name": "Protein kinase domain"}, {"Accession": "IPR000747", "Domain_Name": "Homeodomain engrailed"}, {"Accession": "IPR000848", "Domain_Name": "GPCR, cAMP-type"}, {"Accession": "IPR000859", "Domain_Name": "CUB domain"}, {"Accession": "IPR000953", "Domain_Name": "Chromo/chromo shadow domain"}, {"Accession": "IPR000980", "Domain_Name": "SH2 domain"}, {"Accession": "IPR001098", "Domain_Name": "DNA-directed DNA polymerase, family A, palm domain"}, {"Accession": "IPR001127", "Domain_Name": "Phosphotransferase system, sugar-specific permease EIIA type 1"}, {"Accession": "IPR001158", "Domain_Name": "DIX domain"}, {"Accession": "IPR001254", "Domain_Name": "Serine proteases, trypsin domain"}, {"Accession": "IPR001356", "Domain_Name": "Homeodomain"}, {"Accession": "IPR001452", "Domain_Name": "SH3 domain"}, {"Accession": "IPR001478", "Domain_Name": "PDZ domain"}, {"Accession": "IPR001487", "Domain_Name": "Bromodomain"}, {"Accession": "IPR001605", "Domain_Name": "Pleckstrin homology domain, spectrin-type"}, {"Accession": "IPR001683", "Domain_Name": "Phox homology"}, {"Accession": "IPR002048", "Domain_Name": "EF-hand domain"}, {"Accession": "IPR002182", "Domain_Name": "NB-ARC"}, {"Accession": "IPR003008", "Domain_Name": "Tubulin/FtsZ, GTPase domain"}, {"Accession": "IPR003151", "Domain_Name": "PIK-related kinase, FAT"}, {"Accession": "IPR003959", "Domain_Name": "ATPase, AAA-type, core"}];
+
+        const colorPalette = ['bg-red-600', 'bg-blue-600', 'bg-emerald-600', 'bg-purple-600', 'bg-orange-600', 'bg-cyan-600', 'bg-pink-600', 'bg-indigo-600', 'bg-yellow-600', 'bg-rose-600'];
+
+        // Assign colors and text classes mapping over raw data
+        const domains = rawDomains.map((d, index) => ({
+            ...d,
+            colorClass: colorPalette[index % colorPalette.length],
+            textClass: 'text-white'
+        }));
 
         // DOM Elements
         const libraryContainer = document.getElementById('domain-library');
@@ -197,6 +147,8 @@
         const emptyState = document.getElementById('empty-state');
         const vizContainer = document.getElementById('protein-visualization');
         const descContainer = document.getElementById('protein-description');
+        const domainCountSlider = document.getElementById('domain-count');
+        const domainCountDisplay = document.getElementById('domain-count-display');
 
         // Render the Domain Library Legend
         function renderLibrary() {
@@ -204,22 +156,21 @@
                 const card = document.createElement('div');
                 card.className = 'flex items-start gap-3 p-3 border border-slate-100 rounded-lg hover:bg-slate-50 transition';
                 card.innerHTML = `
-                    <div class="${domain.colorClass} w-10 h-10 rounded shadow-sm flex items-center justify-center flex-shrink-0 text-xs font-bold ${domain.textClass} protein-block">
-                        ${domain.id}
+                    <div class="${domain.colorClass} w-10 h-10 rounded shadow-sm flex items-center justify-center flex-shrink-0 text-[0.6rem] leading-tight text-center font-bold ${domain.textClass} protein-block px-1 break-words">
+                        ${domain.Accession.replace('IPR', '')}
                     </div>
-                    <div>
-                        <h4 class="text-sm font-bold text-slate-800">${domain.name}</h4>
-                        <p class="text-xs text-slate-500 mt-1">${domain.shortDesc}</p>
+                    <div class="overflow-hidden">
+                        <h4 class="text-sm font-bold text-slate-800 truncate" title="${domain.Domain_Name}">${domain.Domain_Name}</h4>
+                        <p class="text-xs text-slate-500 mt-0.5">${domain.Accession}</p>
                     </div>
                 `;
                 libraryContainer.appendChild(card);
             });
         }
 
-        // Generate a random protein sequence
+        // Generate a random protein sequence based on slider value
         function generateSequence() {
-            // Random length between 2 and 4
-            const length = Math.floor(Math.random() * 3) + 2; 
+            const length = parseInt(domainCountSlider.value, 10);
             const sequence = [];
             
             for (let i = 0; i < length; i++) {
@@ -230,70 +181,40 @@
             return sequence;
         }
 
-        // Interpret biological function based on rules
+        // Interpret biological function and localization based on heuristics
         function generateBiologicalDescription(sequence) {
-            const types = {
-                hasSP: sequence.some(d => d.id === 'SP'),
-                hasTM: sequence.some(d => d.id === 'TM'),
-                hasKinase: sequence.some(d => d.id === 'KIN'),
-                hasZF: sequence.some(d => d.id === 'ZF'),
-                hasSH2: sequence.some(d => d.id === 'SH2'),
-                hasSH3: sequence.some(d => d.id === 'SH3'),
-                hasFN3: sequence.some(d => d.id === 'FN3'),
-            };
-
-            let paragraph = `<p class="mb-2"><strong>Evolutionary Result:</strong> This novel chimeric protein comprises ${sequence.length} domains resulting from a localized exon shuffling event. </p>`;
+            const names = sequence.map(d => d.Domain_Name.toLowerCase());
             
-            // Determine Localization
-            let localization = "";
-            if (types.hasSP && types.hasTM) {
-                localization = "Driven by the Signal Peptide, it enters the secretory pathway, while the Transmembrane domain permanently anchors it as an integral membrane protein.";
-            } else if (types.hasSP && !types.hasTM) {
-                localization = "Featuring a Signal Peptide without a Transmembrane anchor, this protein is likely secreted into the extracellular environment.";
-            } else if (types.hasTM && !types.hasSP) {
-                localization = "It contains a Transmembrane domain, suggesting it is embedded in cellular membranes, potentially functioning in late endosomes or localizing via alternative insertion pathways.";
-            } else if (types.hasZF) {
-                localization = "Lacking membrane-targeting domains but containing a Zinc Finger, it likely localizes to the nucleus.";
-            } else {
-                localization = "Without specific membrane-targeting domains, it is predicted to be a soluble, cytoplasmic protein.";
-            }
+            // Heuristics for Localization
+            const isNucleus = names.some(n => n.includes("dna") || n.includes("zinc finger") || n.includes("chromo") || n.includes("homeodomain") || n.includes("hsf") || n.includes("rna") || n.includes("forkhead") || n.includes("pou") || n.includes("bromo"));
+            const isMembrane = names.some(n => n.includes("receptor") || n.includes("gpcr") || n.includes("barrel") || n.includes("permease") || n.includes("phox") || n.includes("pleckstrin") || n.includes("transmembrane"));
             
-            paragraph += `<p class="mb-2">${localization}</p>`;
-
-            // Determine Interactions & Activity
-            let functionText = "";
-            
-            // Catalytic activity
-            if (types.hasKinase) {
-                if (types.hasTM) {
-                    functionText += " It acts as a receptor-like kinase, capable of transmitting signals across the membrane by phosphorylating internal targets. ";
-                } else {
-                    functionText += " Functionally, it serves as an intracellular kinase, propagating signal transduction cascades. ";
-                }
-            }
-            
-            // Binding Modules
-            let bindingModules = [];
-            if (types.hasSH2) bindingModules.push("docking to phosphorylated tyrosines via its SH2 domain");
-            if (types.hasSH3) bindingModules.push("recruiting proline-rich targets with its SH3 module");
-            if (types.hasFN3) bindingModules.push("facilitating extracellular or complex structural scaffolding via Fibronectin III repeats");
-            if (types.hasZF) bindingModules.push("binding directly to DNA or RNA structural motifs using its Zinc Finger");
-
-            if (bindingModules.length > 0) {
-                functionText += ` The protein achieves modular interactions by ${bindingModules.join(' and ')}.`;
-            } else if (!types.hasKinase) {
-                functionText += " It lacks known catalytic or standard interaction domains, suggesting an unknown structural or highly specific scaffolding role.";
+            let localization = "<strong class='text-teal-700'>Predicted Localization:</strong> Cytoplasm (soluble).";
+            if (isMembrane && isNucleus) {
+                localization = "<strong class='text-teal-700'>Predicted Localization:</strong> Dual-localized. May undergo membrane cleavage to translocate to the nucleus.";
+            } else if (isMembrane) {
+                localization = "<strong class='text-teal-700'>Predicted Localization:</strong> Cell Membrane (Integral or Peripheral).";
+            } else if (isNucleus) {
+                localization = "<strong class='text-teal-700'>Predicted Localization:</strong> Nucleus.";
             }
 
-            paragraph += `<p>${functionText}</p>`;
+            // Heuristics for Function
+            const isCatalytic = names.some(n => n.includes("kinase") || n.includes("atpase") || n.includes("polymerase") || n.includes("protease") || n.includes("peptidase") || n.includes("hect") || n.includes("gtpase"));
+            const isScaffold = names.some(n => n.includes("binding") || n.includes("sh2") || n.includes("sh3") || n.includes("pdz") || n.includes("fibronectin") || n.includes("death") || n.includes("kringle") || n.includes("eh domain") || n.includes("ferm") || n.includes("btb"));
             
-            // Unique Combos Highlights
-            if (types.hasSH2 && types.hasKinase) {
-                paragraph += `<p class="mt-2 text-sm text-teal-700 italic">Notable Interaction: The combination of SH2 and Kinase domains suggests a self-regulating enzyme that activates upon binding to other activated receptors, a hallmark of advanced cellular signaling networks.</p>`;
+            let functionDesc = "<strong class='text-teal-700'>Inferred Function:</strong> This novel protein appears to have an undefined or highly specialized structural role, potentially acting as a novel interaction node without intrinsic catalytic activity.";
+            if (isCatalytic && isScaffold) {
+                functionDesc = "<strong class='text-teal-700'>Inferred Function:</strong> This protein likely acts as an active signaling node, utilizing its scaffolding/interaction domains to localize its enzymatic (catalytic) activity to highly specific cellular substrates or complexes.";
+            } else if (isCatalytic) {
+                functionDesc = "<strong class='text-teal-700'>Inferred Function:</strong> This protein primarily functions as a catalyst. Driven by its enzymatic domains, it modulates cellular states via biochemical reactions like phosphorylation, proteolysis, or ATP/GTP hydrolysis.";
+            } else if (isScaffold) {
+                functionDesc = "<strong class='text-teal-700'>Inferred Function:</strong> This protein acts primarily as an adaptor or structural scaffold, mediating protein-protein or protein-ligand interactions to assemble multi-molecular complexes.";
             }
-            if (types.hasZF && types.hasTM) {
-                paragraph += `<p class="mt-2 text-sm text-teal-700 italic">Evolutionary Anomaly: The presence of both a Transmembrane anchor and a nuclear Zinc Finger is highly unusual, potentially indicating a latent transcription factor that is cleaved from the membrane upon stimulation.</p>`;
-            }
+
+            let paragraph = `<h3 class="text-lg font-extrabold text-slate-800 mb-3 border-b border-teal-200 pb-2">Chimeric Protein Overview</h3>`;
+            paragraph += `<p class="mb-3 text-sm leading-relaxed">${localization}</p>`;
+            paragraph += `<p class="mb-3 text-sm leading-relaxed">${functionDesc}</p>`;
+            paragraph += `<div class="mt-4 pt-3 border-t border-teal-100"><p class="text-xs text-slate-500 leading-relaxed"><strong>Composition (${sequence.length} exons):</strong> ${sequence.map(s => `<span class="italic text-slate-600">${s.Domain_Name}</span>`).join(' &rarr; ')}</p></div>`;
 
             return paragraph;
         }
@@ -313,24 +234,19 @@
             sequence.forEach((domain, index) => {
                 // Domain Block
                 const block = document.createElement('div');
-                block.className = `${domain.colorClass} ${domain.textClass} protein-block h-16 w-24 sm:w-28 flex flex-col items-center justify-center rounded-lg shadow-md cursor-pointer relative group`;
+                block.className = `${domain.colorClass} ${domain.textClass} protein-block h-20 w-28 sm:w-36 flex flex-col items-center justify-center rounded-lg shadow-md relative group m-1`;
                 
                 // Content
                 block.innerHTML = `
-                    <span class="font-bold text-lg leading-none">${domain.id}</span>
-                    <span class="text-[0.65rem] opacity-90 mt-1 px-1 text-center truncate w-full">${domain.name}</span>
-                    
-                    <!-- Tooltip -->
-                    <div class="absolute -bottom-12 hidden group-hover:block bg-slate-800 text-white text-xs px-2 py-1 rounded w-max z-10">
-                        ${domain.mechanism}
-                    </div>
+                    <span class="font-bold text-xs truncate w-full px-2 text-center">${domain.Accession}</span>
+                    <span class="text-[0.65rem] opacity-90 mt-1 px-2 text-center line-clamp-2 w-full leading-tight" title="${domain.Domain_Name}">${domain.Domain_Name}</span>
                 `;
                 vizContainer.appendChild(block);
 
                 // Connection line (if not last)
                 if (index < sequence.length - 1) {
                     const line = document.createElement('div');
-                    line.className = 'connection-line';
+                    line.className = 'connection-line my-auto flex-shrink-0';
                     vizContainer.appendChild(line);
                 }
             });
@@ -344,7 +260,6 @@
 
         // Handle the shuffle action
         function handleShuffle() {
-            // Add a brief loading effect
             shuffleBtn.disabled = true;
             shuffleBtn.innerHTML = 'Synthesizing...';
             shuffleBtn.classList.add('opacity-75');
@@ -358,15 +273,20 @@
 
                 // Reset button
                 shuffleBtn.disabled = false;
-                shuffleBtn.innerHTML = 'Shuffle Domains Again';
+                shuffleBtn.innerHTML = 'Shuffle & Generate Protein';
                 shuffleBtn.classList.remove('opacity-75');
-            }, 400); // 400ms synthetic delay for dramatic effect
+            }, 300);
         }
 
         // Initialization
         window.addEventListener('DOMContentLoaded', () => {
             renderLibrary();
             shuffleBtn.addEventListener('click', handleShuffle);
+            
+            // Slider update event
+            domainCountSlider.addEventListener('input', (e) => {
+                domainCountDisplay.innerText = e.target.value;
+            });
         });
 
     </script>
