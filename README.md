@@ -1,4 +1,4 @@
-Exon Shuffler
+**Exon** **Shuffler**
 
 https://pvalissery.github.io/exon_shuffler/
 
@@ -8,14 +8,14 @@ I've always been hooked on the idea of designing custom proteins from scratch. A
 
 First, I wrote a Python scraper to pull domain data from InterPro, mapping them to Gene Ontology (GO) terms to infer their baseline functions. The engine then takes these domains and shuffles them together at random. You can use the slider to control the number of domains, and the tool spits out a completely unique protein that probably wouldn't exist in nature right now. Ultimately, this app is a sandbox for creativity and a demonstration of the extreme versatility of molecular recombination.
 
-Features
+**Features**
 
 Interactive Shuffling: Slider-controlled generation of chimeric proteins containing 2 to 10 distinct domains.
 Curated Domain Library: Runs completely in the browser using a bundled JSON dataset of protein domains and their associated biological functions.
 Heuristic Function Prediction: Procedurally generates natural language descriptions of what the resulting chimera might actually do in a cell based on keyword analysis of its constituent parts.
 Zero Dependencies: Built entirely with vanilla JavaScript and Tailwind CSS. No backend or database required.
 
-What's Next: Directed Evolution
+**What's Next:** Directed Evolution
 
 I am currently building a much more elaborate tool tailored for directed evolution. Instead of relying on random recombination, the focus is on targeted, industrial application-driven design.
 
