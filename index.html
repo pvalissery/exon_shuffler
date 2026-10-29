@@ -3,292 +3,368 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Exon Shuffler - Protein Evolution Simulator</title>
+    <title>Exon Shuffler</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=JetBrains+Mono:wght@400;700&display=swap');
+        
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #f0fdfa; /* Light teal biological vibe */
-        }
-        .protein-block {
-            font-family: 'JetBrains Mono', monospace;
-            transition: all 0.3s ease;
-        }
-        .protein-block:hover {
-            transform: translateY(-5px) scale(1.05);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-        }
-        .connection-line {
-            width: 20px;
-            height: 4px;
-            background-color: #9ca3af;
-            border-radius: 2px;
+            background-color: #f8fafc;
         }
         
-        /* Custom scrollbar for library */
-        .library-scroll::-webkit-scrollbar {
-            width: 6px;
+        .domain-block {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            animation: popIn 0.5s ease-out forwards;
+            opacity: 0;
+            transform: scale(0.9);
         }
-        .library-scroll::-webkit-scrollbar-track {
-            background: #e5e7eb; 
+        
+        .domain-block:hover {
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        @keyframes popIn {
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        /* Custom scrollbar for the library */
+        .custom-scroll::-webkit-scrollbar {
+            width: 8px;
+        }
+        .custom-scroll::-webkit-scrollbar-track {
+            background: #f1f5f9; 
             border-radius: 4px;
         }
-        .library-scroll::-webkit-scrollbar-thumb {
-            background: #9ca3af; 
+        .custom-scroll::-webkit-scrollbar-thumb {
+            background: #cbd5e1; 
             border-radius: 4px;
+        }
+        .custom-scroll::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8; 
+        }
+
+        .mono-text {
+            font-family: 'JetBrains Mono', monospace;
         }
     </style>
 </head>
 <body class="text-slate-800 min-h-screen flex flex-col">
 
     <!-- Header -->
-    <header class="bg-teal-700 text-white shadow-lg py-6 px-4 md:px-8">
-        <div class="max-w-5xl mx-auto flex items-center justify-between">
-            <div>
-                <h1 class="text-3xl font-extrabold tracking-tight flex items-center gap-3">
-                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
-                    Exon Shuffler
-                </h1>
-                <p class="mt-2 text-teal-100 max-w-2xl text-sm md:text-base">
-                    Simulate molecular evolution by shuffling exons (protein domains). Discover how complex, novel protein functions emerge from the simple rearrangement of modular building blocks.
-                </p>
-            </div>
+    <header class="bg-indigo-700 text-white shadow-lg border-b-4 border-indigo-500">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <h1 class="text-3xl font-extrabold tracking-tight flex items-center gap-3">
+                <svg class="w-8 h-8 text-indigo-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
+                Exon Shuffler
+            </h1>
+            <p class="mt-2 text-indigo-100 max-w-3xl text-sm sm:text-base">
+                Explore how biological complexity arises from simple, modular building blocks. This tool simulates evolutionary exon shuffling by randomly combining distinct protein domains to synthesize novel chimeric macromolecules.
+            </p>
         </div>
     </header>
 
     <!-- Main Content -->
-    <main class="flex-grow max-w-5xl mx-auto w-full p-4 md:p-8 flex flex-col gap-8">
+    <main class="flex-grow max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8 grid grid-cols-1 lg:grid-cols-12 gap-8">
         
-        <!-- Top Section: Library & Controls -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Left Column: Controls & Library -->
+        <div class="lg:col-span-4 flex flex-col gap-6">
             
-            <!-- Domain Library -->
-            <div class="bg-white rounded-xl shadow-sm border border-teal-100 p-5 md:col-span-2">
-                <h2 class="text-xl font-bold text-teal-800 mb-4 flex items-center gap-2">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
-                    Exon / Domain Library
+            <!-- Control Panel -->
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
+                <h2 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2 border-b border-slate-100 pb-2">
+                    <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
+                    Synthesis Controls
                 </h2>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 h-64 overflow-y-auto library-scroll pr-2" id="domain-library">
-                    <!-- Populated by JS -->
+                
+                <div class="mb-6">
+                    <div class="flex justify-between items-center mb-2">
+                        <label for="domain-count" class="text-sm font-semibold text-slate-700">Number of Domains (Exons)</label>
+                        <span id="domain-count-display" class="bg-indigo-100 text-indigo-800 text-xs font-bold px-2 py-1 rounded-full">4</span>
+                    </div>
+                    <input type="range" id="domain-count" min="2" max="10" value="4" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-indigo-600">
+                    <div class="flex justify-between text-xs text-slate-400 mt-1 px-1">
+                        <span>2</span>
+                        <span>10</span>
+                    </div>
                 </div>
-            </div>
 
-            <!-- Controls -->
-            <div class="bg-teal-50 rounded-xl shadow-sm border border-teal-200 p-5 flex flex-col items-center justify-center text-center">
-                <div class="mb-6 w-full">
-                    <div class="w-20 h-20 mx-auto bg-teal-100 rounded-full flex items-center justify-center mb-3">
-                        <svg class="w-10 h-10 text-teal-600 animate-spin-slow" style="animation: spin 8s linear infinite;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
-                    </div>
-                    <h3 class="font-bold text-teal-900">Recombination Engine</h3>
-                    <p class="text-sm text-teal-700 mt-2 mb-4">Combine random domains to synthesize a novel protein.</p>
-                    
-                    <div class="w-full text-left px-2">
-                        <label for="domain-count" class="block text-sm font-bold text-teal-800 mb-1">Number of Domains: <span id="domain-count-display" class="text-teal-600">4</span></label>
-                        <input type="range" id="domain-count" min="2" max="10" value="4" class="w-full h-2 bg-teal-200 rounded-lg appearance-none cursor-pointer">
-                    </div>
-                </div>
-                <button id="shuffle-btn" class="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 px-4 rounded-lg shadow-md transition duration-200 transform hover:-translate-y-1 active:translate-y-0">
-                    Shuffle & Generate Protein
+                <button id="generate-btn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-lg shadow-md transition duration-200 flex items-center justify-center gap-2 group">
+                    <svg class="w-5 h-5 group-hover:rotate-180 transition-transform duration-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                    Generate Chimeric Protein
                 </button>
             </div>
+
+            <!-- Domain Library -->
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 flex flex-col flex-grow overflow-hidden max-h-[500px]">
+                <div class="p-4 border-b border-slate-100 bg-slate-50 flex justify-between items-center">
+                    <h2 class="text-sm font-bold text-slate-800 flex items-center gap-2">
+                        <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                        Domain Library
+                    </h2>
+                    <span id="library-count" class="text-xs font-semibold text-slate-500 bg-slate-200 px-2 py-0.5 rounded-full">0 items</span>
+                </div>
+                <div class="p-3 overflow-y-auto custom-scroll flex-grow bg-white" id="library-container">
+                    <!-- Library items injected here -->
+                </div>
+            </div>
         </div>
 
-        <!-- Result Section -->
-        <div class="bg-white rounded-xl shadow-md border border-slate-200 overflow-hidden flex flex-col">
-            <div class="bg-slate-50 border-b border-slate-200 p-4">
-                <h2 class="text-xl font-bold text-slate-800">Generated Protein Overview</h2>
-            </div>
+        <!-- Right Column: Visualization & Analysis -->
+        <div class="lg:col-span-8 flex flex-col gap-6">
             
-            <div class="p-6 md:p-8 flex flex-col items-center justify-center min-h-[250px] relative">
+            <!-- Visualization -->
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden flex flex-col">
+                <div class="bg-slate-50 border-b border-slate-200 p-4">
+                    <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                        <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"></path></svg>
+                        Structural Map
+                    </h2>
+                </div>
                 
-                <!-- Placeholder / Initial State -->
-                <div id="empty-state" class="text-center text-slate-400">
-                    <svg class="w-16 h-16 mx-auto mb-3 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
-                    <p>Click "Shuffle Domains" to generate a protein.</p>
-                </div>
+                <div class="p-6 md:p-10 flex flex-col items-center justify-center min-h-[300px] relative bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-slate-50 via-white to-white">
+                    
+                    <!-- Initial State -->
+                    <div id="empty-state" class="text-center text-slate-400 max-w-sm">
+                        <svg class="w-16 h-16 mx-auto mb-4 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
+                        <p class="text-sm font-medium">No protein synthesized yet. Adjust the domain count and click "Generate Chimeric Protein" to begin.</p>
+                    </div>
 
-                <!-- Visualization -->
-                <div id="protein-visualization" class="hidden flex-wrap items-center justify-center gap-1 w-full pb-8">
-                    <!-- Populated by JS -->
-                </div>
+                    <!-- Protein Visualizer -->
+                    <div id="protein-visualizer" class="hidden flex-wrap items-center justify-center w-full gap-y-6">
+                        <!-- Populated by JS -->
+                    </div>
 
-                <!-- Generated Description -->
-                <div id="protein-description" class="hidden w-full mt-6 bg-slate-50 rounded-lg p-5 border-l-4 border-teal-500 text-slate-700 leading-relaxed">
-                    <!-- Populated by JS -->
                 </div>
-
             </div>
-        </div>
 
+            <!-- Analysis Overview -->
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden flex-grow flex flex-col">
+                <div class="bg-slate-50 border-b border-slate-200 p-4">
+                    <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                        <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                        Heuristic Analysis & Overview
+                    </h2>
+                </div>
+                
+                <div id="analysis-container" class="p-6 md:p-8 text-slate-700 hidden flex-col h-full">
+                    <!-- Populated by JS -->
+                </div>
+                
+                <div id="analysis-empty" class="p-6 flex-grow flex items-center justify-center text-slate-400 italic text-sm">
+                    Awaiting protein sequence for analysis...
+                </div>
+            </div>
+
+        </div>
     </main>
 
     <!-- Footer -->
-    <footer class="bg-slate-800 text-slate-400 py-6 text-center text-sm">
-        <p>Exon Shuffler Simulator &copy; 2026. Illustrating the power of combinatorial evolution.</p>
+    <footer class="bg-slate-900 text-slate-400 py-6 text-center text-sm border-t-4 border-indigo-800 mt-auto">
+        <p>Exon Shuffler &copy; 2026. A tool for illustrating combinatorial molecular evolution.</p>
     </footer>
 
     <script>
-        // Data Structure: Hardcoded Protein Domains JSON
-        const rawDomains = [{"Accession": "IPR000001", "Domain_Name": "Kringle"}, {"Accession": "IPR000008", "Domain_Name": "C2 domain"}, {"Accession": "IPR000156", "Domain_Name": "Ran binding domain"}, {"Accession": "IPR000160", "Domain_Name": "GGDEF domain"}, {"Accession": "IPR000182", "Domain_Name": "GNAT domain"}, {"Accession": "IPR000209", "Domain_Name": "Peptidase S8/S53 domain"}, {"Accession": "IPR000210", "Domain_Name": "BTB/POZ domain"}, {"Accession": "IPR000232", "Domain_Name": "Heat shock factor (HSF)-type, DNA-binding"}, {"Accession": "IPR000253", "Domain_Name": "Forkhead-associated (FHA) domain"}, {"Accession": "IPR000254", "Domain_Name": "Cellulose-binding domain"}, {"Accession": "IPR000261", "Domain_Name": "EH domain"}, {"Accession": "IPR000270", "Domain_Name": "PB1 domain"}, {"Accession": "IPR000299", "Domain_Name": "FERM domain"}, {"Accession": "IPR000306", "Domain_Name": "FYVE zinc finger"}, {"Accession": "IPR000315", "Domain_Name": "B-box-type zinc finger"}, {"Accession": "IPR000327", "Domain_Name": "POU-specific domain"}, {"Accession": "IPR000409", "Domain_Name": "BEACH domain"}, {"Accession": "IPR000433", "Domain_Name": "Zinc finger, ZZ-type"}, {"Accession": "IPR000488", "Domain_Name": "Death domain"}, {"Accession": "IPR000504", "Domain_Name": "RNA recognition motif domain"}, {"Accession": "IPR000531", "Domain_Name": "TonB-dependent receptor-like, beta-barrel"}, {"Accession": "IPR000562", "Domain_Name": "Fibronectin type II domain"}, {"Accession": "IPR000569", "Domain_Name": "HECT domain"}, {"Accession": "IPR000595", "Domain_Name": "Cyclic nucleotide-binding domain"}, {"Accession": "IPR000719", "Domain_Name": "Protein kinase domain"}, {"Accession": "IPR000747", "Domain_Name": "Homeodomain engrailed"}, {"Accession": "IPR000848", "Domain_Name": "GPCR, cAMP-type"}, {"Accession": "IPR000859", "Domain_Name": "CUB domain"}, {"Accession": "IPR000953", "Domain_Name": "Chromo/chromo shadow domain"}, {"Accession": "IPR000980", "Domain_Name": "SH2 domain"}, {"Accession": "IPR001098", "Domain_Name": "DNA-directed DNA polymerase, family A, palm domain"}, {"Accession": "IPR001127", "Domain_Name": "Phosphotransferase system, sugar-specific permease EIIA type 1"}, {"Accession": "IPR001158", "Domain_Name": "DIX domain"}, {"Accession": "IPR001254", "Domain_Name": "Serine proteases, trypsin domain"}, {"Accession": "IPR001356", "Domain_Name": "Homeodomain"}, {"Accession": "IPR001452", "Domain_Name": "SH3 domain"}, {"Accession": "IPR001478", "Domain_Name": "PDZ domain"}, {"Accession": "IPR001487", "Domain_Name": "Bromodomain"}, {"Accession": "IPR001605", "Domain_Name": "Pleckstrin homology domain, spectrin-type"}, {"Accession": "IPR001683", "Domain_Name": "Phox homology"}, {"Accession": "IPR002048", "Domain_Name": "EF-hand domain"}, {"Accession": "IPR002182", "Domain_Name": "NB-ARC"}, {"Accession": "IPR003008", "Domain_Name": "Tubulin/FtsZ, GTPase domain"}, {"Accession": "IPR003151", "Domain_Name": "PIK-related kinase, FAT"}, {"Accession": "IPR003959", "Domain_Name": "ATPase, AAA-type, core"}];
+        // --- 1. DATA: The JSON Library ---
+        const domainLibrary = [{"Accession": "IPR015293", "Domain_Name": "1,4-alpha-glucan branching enzyme, C-terminal", "Domain_Function": ""}, {"Accession": "IPR063516", "Domain_Name": "KCTD10/TNFAIP1/KCTD13, C-terminal domain", "Domain_Function": ""}, {"Accession": "IPR006543", "Domain_Name": "Histidinol-phosphate phosphatase", "Domain_Function": "phosphatase activity"}, {"Accession": "IPR018713", "Domain_Name": "ER-bound oxygenase mpaB/mpaB'/Rubber oxygenase, catalytic domain", "Domain_Function": "oxidoreductase activity"}, {"Accession": "IPR045462", "Domain_Name": "Aminoacyl-tRNA synthetase, class I, anticodon-binding", "Domain_Function": ""}, {"Accession": "IPR048701", "Domain_Name": "CIP2A, N-terminal", "Domain_Function": ""}, {"Accession": "IPR039154", "Domain_Name": "Serine/Threonine kinase LKB1, catalytic domain", "Domain_Function": "protein serine/threonine kinase activity, protein kinase activator activity, regulation of cell growth, establishment of cell polarity, glucose homeostasis"}, {"Accession": "IPR044365", "Domain_Name": "Non-structural protein 6, deltacoronavirus", "Domain_Function": "regulation of autophagy"}, {"Accession": "IPR007282", "Domain_Name": "NOT2/NOT3/NOT5, C-terminal", "Domain_Function": "regulation of DNA-templated transcription"}, {"Accession": "IPR000515", "Domain_Name": "ABC transporter type 1, transmembrane domain MetI-like", "Domain_Function": "transmembrane transport, membrane"}, {"Accession": "IPR046461", "Domain_Name": "Terminase large subunit-like, ATPase domain", "Domain_Function": ""}, {"Accession": "IPR044103", "Domain_Name": "LAS seventeen-binding protein 5 , GAT domain", "Domain_Function": "endocytosis, actin filament organization"}, {"Accession": "IPR013854", "Domain_Name": "Transcription factor AP-2, C-terminal", "Domain_Function": ""}, {"Accession": "IPR005311", "Domain_Name": "Penicillin-binding protein, dimerisation domain", "Domain_Function": "penicillin binding"}, {"Accession": "IPR006757", "Domain_Name": "Opioid growth factor receptor (OGFr)-like, conserved domain", "Domain_Function": "signaling receptor activity, membrane"}, {"Accession": "IPR030942", "Domain_Name": "IgG-blocking virulence domain", "Domain_Function": ""}, {"Accession": "IPR059729", "Domain_Name": "YonJ, middle domain", "Domain_Function": ""}, {"Accession": "IPR056565", "Domain_Name": "Activating transcription factor 7-interacting protein, Fn3 domain", "Domain_Function": ""}, {"Accession": "IPR030384", "Domain_Name": "SAM-dependent methyltransferase SMT-type", "Domain_Function": "methyltransferase activity"}, {"Accession": "IPR035014", "Domain_Name": "cGMP-dependent protein kinase, catalytic domain", "Domain_Function": "cGMP-dependent protein kinase activity"}, {"Accession": "IPR032986", "Domain_Name": "Roundabout homologue 1, immunoglobulin-like domain 3", "Domain_Function": "axon guidance receptor activity, axon guidance, axon midline choice point recognition, Roundabout signaling pathway"}, {"Accession": "IPR000201", "Domain_Name": "Hepadnaviral P protein, N-terminal", "Domain_Function": "DNA binding, DNA-directed DNA polymerase activity, DNA replication"}, {"Accession": "IPR059196", "Domain_Name": "VscT2-like", "Domain_Function": ""}, {"Accession": "IPR033393", "Domain_Name": "Nuclear receptor-binding factor 2, MIT domain", "Domain_Function": ""}, {"Accession": "IPR001730", "Domain_Name": "Potyvirus NIa protease (NIa-pro) domain", "Domain_Function": "cysteine-type peptidase activity, proteolysis"}, {"Accession": "IPR045204", "Domain_Name": "Laforin-like, dual specificity phosphatase domain", "Domain_Function": "carbohydrate phosphatase activity"}, {"Accession": "IPR040834", "Domain_Name": "Nicking enzyme C-terminal middle helical domain", "Domain_Function": ""}, {"Accession": "IPR043629", "Domain_Name": "Salyut domain", "Domain_Function": ""}, {"Accession": "IPR011072", "Domain_Name": "HR1 rho-binding domain", "Domain_Function": "signal transduction"}, {"Accession": "IPR032170", "Domain_Name": "Domain of unknown function DUF5006", "Domain_Function": ""}, {"Accession": "IPR024372", "Domain_Name": "Proteasome component Ecm29, N-terminal", "Domain_Function": "molecular adaptor activity, proteasome assembly"}, {"Accession": "IPR005805", "Domain_Name": "Rieske iron-sulphur protein, C-terminal", "Domain_Function": "2 iron, 2 sulfur cluster binding, membrane"}, {"Accession": "IPR000297", "Domain_Name": "Peptidyl-prolyl cis-trans isomerase, PpiC-type", "Domain_Function": "peptidyl-prolyl cis-trans isomerase activity"}, {"Accession": "IPR017942", "Domain_Name": "Lipid-binding serum glycoprotein, N-terminal", "Domain_Function": "lipid binding"}, {"Accession": "IPR046774", "Domain_Name": "Putative adhesin domain (group 10)", "Domain_Function": ""}, {"Accession": "IPR000780", "Domain_Name": "MCP methyltransferase, CheR-type", "Domain_Function": "S-adenosylmethionine-dependent methyltransferase activity"}, {"Accession": "IPR044070", "Domain_Name": "Rubella virus (RUBV) nonstructural (NS) protease domain", "Domain_Function": "cysteine-type endopeptidase activity"}, {"Accession": "IPR037877", "Domain_Name": "HMT2C, PHD3", "Domain_Function": "histone H3K4 methyltransferase activity, MLL3/4 complex"}, {"Accession": "IPR000382", "Domain_Name": "Peptidase S39B, luteovirus", "Domain_Function": "serine-type endopeptidase activity, viral process, membrane"}, {"Accession": "IPR033857", "Domain_Name": "Bacillopeptidase F, peptidase domain", "Domain_Function": "serine-type endopeptidase activity, proteolysis"}, {"Accession": "IPR016166", "Domain_Name": "FAD-binding domain, PCMH-type", "Domain_Function": "FAD binding"}, {"Accession": "IPR045172", "Domain_Name": "Tubulin-folding cofactor B, ubiquitin-like domain", "Domain_Function": "alpha-tubulin binding, tubulin complex assembly, post-chaperonin tubulin folding pathway"}, {"Accession": "IPR032810", "Domain_Name": "CCA-adding enzyme, C-terminal", "Domain_Function": ""}, {"Accession": "IPR004009", "Domain_Name": "Myosin, SH3 domain", "Domain_Function": "cytoskeletal motor activity, ATP binding, myosin complex"}, {"Accession": "IPR001594", "Domain_Name": "Palmitoyltransferase, DHHC domain", "Domain_Function": "palmitoyltransferase activity"}, {"Accession": "IPR012948", "Domain_Name": "AARP2CN", "Domain_Function": "ribosome biogenesis, nucleus"}, {"Accession": "IPR047224", "Domain_Name": "Fatty acid synthase subunit alpha-like, C-terminal", "Domain_Function": ""}, {"Accession": "IPR053936", "Domain_Name": "Wntless, GOLD domain", "Domain_Function": ""}, {"Accession": "IPR033979", "Domain_Name": "MINDY deubiquitinase domain", "Domain_Function": "cysteine-type deubiquitinase activity, K48-linked deubiquitinase activity"}, {"Accession": "IPR046629", "Domain_Name": "Domain of unknown function DUF6741", "Domain_Function": ""}, {"Accession": "IPR025525", "Domain_Name": "hAT-like transposase-like", "Domain_Function": "DNA binding"}, {"Accession": "IPR010000", "Domain_Name": "Caerin 1", "Domain_Function": "extracellular region"}, {"Accession": "IPR015164", "Domain_Name": "K cyclin, C-terminal", "Domain_Function": ""}, {"Accession": "IPR037857", "Domain_Name": "MTMR1, PH-GRAM", "Domain_Function": "phosphatidylinositol phosphate phosphatase activity, phosphatidylinositol dephosphorylation"}, {"Accession": "IPR032090", "Domain_Name": "Peptide chain release factor 3, C-terminal", "Domain_Function": ""}, {"Accession": "IPR029480", "Domain_Name": "Transposase-associated domain", "Domain_Function": ""}, {"Accession": "IPR044084", "Domain_Name": "AvModA-like, substrate binding domain", "Domain_Function": "molybdate ion binding, molybdate ion transport"}, {"Accession": "IPR037606", "Domain_Name": "Diacylglycerol kinase delta, SAM domain", "Domain_Function": "ATP-dependent diacylglycerol kinase activity, protein homodimerization activity, protein heterodimerization activity, signal transduction"}, {"Accession": "IPR034273", "Domain_Name": "Ascorbate oxidase homologue, first cupredoxin domain", "Domain_Function": "copper ion binding"}, {"Accession": "IPR004739", "Domain_Name": "GMP synthase, glutamine amidotransferase", "Domain_Function": "GMP synthase (glutamine-hydrolyzing) activity, ATP binding, GMP biosynthetic process"}, {"Accession": "IPR055237", "Domain_Name": "Cdc6, AAA+ ATPase-type lid domain", "Domain_Function": ""}, {"Accession": "IPR037431", "Domain_Name": "RNA exonuclease 4, DEDDh 3'-5' exonuclease domain", "Domain_Function": "3'-5' exonuclease activity, rRNA processing"}, {"Accession": "IPR002864", "Domain_Name": "Acyl-ACP thioesterase, N-terminal hotdog domain", "Domain_Function": "thiolester hydrolase activity, fatty acid biosynthetic process"}, {"Accession": "IPR037929", "Domain_Name": "DCC-interacting protein 13-alpha, BAR domain", "Domain_Function": "identical protein binding"}, {"Accession": "IPR039541", "Domain_Name": "Metallophosphoesterase 1, metallophosphatase domain", "Domain_Function": "phosphoric diester hydrolase activity, endoplasmic reticulum to Golgi vesicle-mediated transport, endoplasmic reticulum-Golgi intermediate compartment"}, {"Accession": "IPR000209", "Domain_Name": "Peptidase S8/S53 domain", "Domain_Function": "serine-type peptidase activity, proteolysis"}, {"Accession": "IPR027352", "Domain_Name": "Nonstructural protein 13, zinc-binding domain, coronavirus-like", "Domain_Function": "zinc ion binding"}, {"Accession": "IPR063356", "Domain_Name": "Protein A, N-terminal Ig-like domain", "Domain_Function": ""}, {"Accession": "IPR012308", "Domain_Name": "DNA ligase, ATP-dependent, N-terminal", "Domain_Function": "DNA binding, DNA ligase (ATP) activity, DNA repair, DNA recombination"}, {"Accession": "IPR012549", "Domain_Name": "Phosphoethanolamine transferase, N-terminal", "Domain_Function": "membrane"}, {"Accession": "IPR002734", "Domain_Name": "Bacterial bifunctional deaminase-reductase, C-terminal", "Domain_Function": "5-amino-6-(5-phosphoribosylamino)uracil reductase activity, riboflavin biosynthetic process"}, {"Accession": "IPR004680", "Domain_Name": "Citrate transporter-like domain", "Domain_Function": "transmembrane transport, membrane"}, {"Accession": "IPR041295", "Domain_Name": "MapZ, extracellular domain 1", "Domain_Function": ""}, {"Accession": "IPR013237", "Domain_Name": "DNA primase/helicase Gp4, N-terminal, Bacteriophage T7-like", "Domain_Function": "helicase activity, zinc ion binding"}, {"Accession": "IPR044119", "Domain_Name": "LigC-like, adenylation domain", "Domain_Function": "ATP binding, DNA repair, DNA recombination"}, {"Accession": "IPR041373", "Domain_Name": "Reverse transcriptase, RNase H-like domain", "Domain_Function": ""}, {"Accession": "IPR021766", "Domain_Name": "Phosphate regulon sensor protein PhoR, N-terminal domain", "Domain_Function": "phosphorelay sensor kinase activity, phosphoprotein phosphatase activity, phosphorelay signal transduction system"}, {"Accession": "IPR055339", "Domain_Name": "WD repeat and HMG-box DNA-binding protein 1, HMG-box", "Domain_Function": "DNA binding, DNA-templated DNA replication"}, {"Accession": "IPR004149", "Domain_Name": "Zinc-finger, NAD-dependent DNA ligase C4-type", "Domain_Function": "DNA ligase (NAD+) activity, DNA replication, DNA repair"}, {"Accession": "IPR042061", "Domain_Name": "Peregrin, ePHD domain", "Domain_Function": ""}, {"Accession": "IPR002552", "Domain_Name": "Spike glycoprotein S2, coronavirus", "Domain_Function": "fusion of virus membrane with host plasma membrane, fusion of virus membrane with host endosome membrane, receptor-mediated virion attachment to host cell, endocytosis involved in viral entry into host cell, membrane, viral envelope, virion membrane"}, {"Accession": "IPR001678", "Domain_Name": "SAM-dependent methyltransferase RsmB-F/NOP2-type domain", "Domain_Function": "methyltransferase activity"}, {"Accession": "IPR000943", "Domain_Name": "RNA polymerase sigma-70", "Domain_Function": "DNA-binding transcription factor activity, DNA-templated transcription initiation, regulation of DNA-templated transcription"}, {"Accession": "IPR004169", "Domain_Name": "Spider toxin domain", "Domain_Function": "ion channel inhibitor activity, extracellular region"}, {"Accession": "IPR007371", "Domain_Name": "Thiamin pyrophosphokinase, catalytic domain", "Domain_Function": "thiamine diphosphokinase activity, ATP binding, thiamine diphosphate biosynthetic process"}, {"Accession": "IPR034668", "Domain_Name": "Novel protein kinase C theta, catalytic domain", "Domain_Function": "diacylglycerol-dependent serine/threonine kinase activity, protein phosphorylation"}, {"Accession": "IPR010339", "Domain_Name": "TIP49, P-loop domain", "Domain_Function": "ATP binding"}, {"Accession": "IPR024970", "Domain_Name": "Maelstrom domain", "Domain_Function": "regulation of miRNA-mediated gene silencing"}, {"Accession": "IPR020828", "Domain_Name": "Glyceraldehyde 3-phosphate dehydrogenase, NAD(P) binding domain", "Domain_Function": "NAD binding"}, {"Accession": "IPR046462", "Domain_Name": "Terminase large subunit-like, endonuclease domain", "Domain_Function": "endonuclease activity"}, {"Accession": "IPR004189", "Domain_Name": "Bacteriophage Mu, transposase", "Domain_Function": "DNA binding, transposase activity, DNA transposition, DNA integration"}, {"Accession": "IPR015251", "Domain_Name": "X-Prolyl dipeptidyl aminopeptidase PepX, N-terminal domain", "Domain_Function": "dipeptidyl-peptidase activity, proteolysis"}, {"Accession": "IPR006139", "Domain_Name": "D-isomer specific 2-hydroxyacid dehydrogenase, catalytic domain", "Domain_Function": "oxidoreductase activity, acting on the CH-OH group of donors, NAD or NADP as acceptor, NAD binding"}, {"Accession": "IPR059075", "Domain_Name": "TEL2-interacting protein 1, second TPR domain", "Domain_Function": ""}, {"Accession": "IPR040157", "Domain_Name": "Max dimerization protein 1, basic Helix-Loop-Helix-zipper domain", "Domain_Function": "negative regulation of transcription by RNA polymerase II"}, {"Accession": "IPR007324", "Domain_Name": "Sugar-binding domain, putative", "Domain_Function": "carbohydrate binding"}, {"Accession": "IPR041608", "Domain_Name": "Embryo surrounding factor 1, brassicaceae", "Domain_Function": "suspensor development"}, {"Accession": "IPR010957", "Domain_Name": "Gamma/beta/epsilon proteobacterial P-protein, chorismate mutase domain", "Domain_Function": "chorismate mutase activity, L-phenylalanine biosynthetic process, cytoplasm"}, {"Accession": "IPR043789", "Domain_Name": "Domain of unknown function DUF5731", "Domain_Function": ""}, {"Accession": "IPR001003", "Domain_Name": "MHC class II, alpha chain, N-terminal", "Domain_Function": "immune response, antigen processing and presentation, membrane, MHC class II protein complex"}, {"Accession": "IPR055848", "Domain_Name": "Domain of unknown function DUF7425", "Domain_Function": ""}, {"Accession": "IPR000298", "Domain_Name": "Cytochrome c oxidase subunit III-like", "Domain_Function": "cytochrome-c oxidase activity, membrane"}, {"Accession": "IPR044728", "Domain_Name": "ATP-dependent RNA helicase eIF4A, DEAD-box helicase domain", "Domain_Function": "ATP binding"}, {"Accession": "IPR022412", "Domain_Name": "Quinolinate phosphoribosyl transferase, N-terminal", "Domain_Function": "pentosyltransferase activity"}, {"Accession": "IPR056033", "Domain_Name": "Domain of unknown function DUF7614", "Domain_Function": ""}, {"Accession": "IPR040775", "Domain_Name": "Tail spike TSP1/Gp66, N-terminal domain", "Domain_Function": ""}, {"Accession": "IPR001037", "Domain_Name": "Integrase, C-terminal, retroviral", "Domain_Function": "nucleic acid binding"}, {"Accession": "IPR026800", "Domain_Name": "Dedicator of cytokinesis protein 3, DHR2 domain", "Domain_Function": "guanyl-nucleotide exchange factor activity, GTPase activator activity"}, {"Accession": "IPR005025", "Domain_Name": "NADPH-dependent FMN reductase-like domain", "Domain_Function": "oxidoreductase activity"}, {"Accession": "IPR039192", "Domain_Name": "Glycogen synthase kinase 3, catalytic domain", "Domain_Function": "protein serine/threonine kinase activity"}, {"Accession": "IPR030379", "Domain_Name": "Septin-type guanine nucleotide-binding (G) domain", "Domain_Function": "GTP binding"}, {"Accession": "IPR022604", "Domain_Name": "Domain of unknown function DUF2955", "Domain_Function": ""}, {"Accession": "IPR013401", "Domain_Name": "Type III secretion regulator, YopN/LcrE/InvE/MxiC", "Domain_Function": "protein secretion by the type III secretion system, negative regulation of protein secretion, cell surface"}, {"Accession": "IPR056449", "Domain_Name": "Capsid protein Vp20", "Domain_Function": ""}, {"Accession": "IPR046765", "Domain_Name": "Antitoxin-like, ribbon-helix-helix", "Domain_Function": ""}, {"Accession": "IPR001093", "Domain_Name": "IMP dehydrogenase/GMP reductase", "Domain_Function": "catalytic activity"}, {"Accession": "IPR003185", "Domain_Name": "Proteasome activator PA28, N-terminal domain", "Domain_Function": "proteasome activator complex"}, {"Accession": "IPR058353", "Domain_Name": "Domain of unknown function DUF8040", "Domain_Function": ""}, {"Accession": "IPR010981", "Domain_Name": "SinR repressor/SinI anti-repressor, dimerisation domain", "Domain_Function": "protein dimerization activity, regulation of DNA-templated transcription"}, {"Accession": "IPR060271", "Domain_Name": "GTF2H2, zinc ribbon domain", "Domain_Function": ""}, {"Accession": "IPR015408", "Domain_Name": "Zinc finger, Mcm10/DnaG-type", "Domain_Function": "DNA replication, nucleus"}, {"Accession": "IPR000433", "Domain_Name": "Zinc finger, ZZ-type", "Domain_Function": "zinc ion binding"}, {"Accession": "IPR037400", "Domain_Name": "Malonate utilization transcriptional regulator, PBP2 domain", "Domain_Function": "regulation of DNA-templated transcription"}, {"Accession": "IPR005306", "Domain_Name": "Nepovirus coat protein, N-terminal", "Domain_Function": "viral capsid"}, {"Accession": "IPR030396", "Domain_Name": "Peptidase family S6 domain", "Domain_Function": "endopeptidase activity"}, {"Accession": "IPR058543", "Domain_Name": "RSE1/DDB1/CPSF1, second beta-propeller", "Domain_Function": ""}, {"Accession": "IPR015280", "Domain_Name": "Rap1, DNA-binding domain", "Domain_Function": "DNA binding"}, {"Accession": "IPR037733", "Domain_Name": "Extended synaptotagmin, C2A domain", "Domain_Function": "lipid transport"}, {"Accession": "IPR006364", "Domain_Name": "Precorrin-2 C(20)-methyltransferase domain", "Domain_Function": "S-adenosylmethionine-dependent methyltransferase activity, cobalamin biosynthetic process"}, {"Accession": "IPR056745", "Domain_Name": "TYW2, N-terminal domain", "Domain_Function": ""}, {"Accession": "IPR005106", "Domain_Name": "Aspartate/homoserine dehydrogenase, NAD-binding", "Domain_Function": "oxidoreductase activity, NADP binding"}, {"Accession": "IPR021721", "Domain_Name": "Zinc finger, CCCH-type, TRM13", "Domain_Function": "methyltransferase activity"}, {"Accession": "IPR021798", "Domain_Name": "Alpha-(1->3)-arabinofuranosyltransferase, N-terminal GT-C domain", "Domain_Function": "transferase activity"}, {"Accession": "IPR032199", "Domain_Name": "RecQ-mediated genome instability protein 1, C-terminal OB-fold domain", "Domain_Function": "nucleotide binding"}, {"Accession": "IPR064743", "Domain_Name": "Receptor-type tyrosine-protein phosphatase zeta, PTP-like domain", "Domain_Function": ""}, {"Accession": "IPR061731", "Domain_Name": "Domain of unknown function DUF8670", "Domain_Function": ""}, {"Accession": "IPR034652", "Domain_Name": "Signal recognition particle subunit SRP68, RNA-binding domain", "Domain_Function": "RNA binding"}, {"Accession": "IPR034290", "Domain_Name": "Ephrin type-B receptor 4, ligand binding domain", "Domain_Function": "protein binding"}, {"Accession": "IPR033906", "Domain_Name": "Lipase, N-terminal", "Domain_Function": "lipid metabolic process"}, {"Accession": "IPR022740", "Domain_Name": "Polyphenol oxidase, C-terminal", "Domain_Function": "catechol oxidase activity"}, {"Accession": "IPR005542", "Domain_Name": "PBX, PBC domain", "Domain_Function": "DNA-binding transcription factor activity, nucleus"}, {"Accession": "IPR013983", "Domain_Name": "Aldehyde ferredoxin oxidoreductase, N-terminal", "Domain_Function": "oxidoreductase activity, oxidoreductase activity, acting on the aldehyde or oxo group of donors, iron-sulfur protein as acceptor, iron-sulfur cluster binding"}, {"Accession": "IPR037704", "Domain_Name": "Phosphatidylinositol 3-kinase alpha, catalytic domain", "Domain_Function": "1-phosphatidylinositol-3-kinase activity, phosphatidylinositol 3-kinase/protein kinase B signal transduction"}, {"Accession": "IPR000756", "Domain_Name": "Diacylglycerol kinase, accessory domain", "Domain_Function": "ATP-dependent diacylglycerol kinase activity, phospholipase C-activating G protein-coupled receptor signaling pathway"}, {"Accession": "IPR064225", "Domain_Name": "CV39L/BP39L lectin-like domain", "Domain_Function": ""}, {"Accession": "IPR031704", "Domain_Name": "Glycosyl hydrolase family 36, N-terminal", "Domain_Function": ""}, {"Accession": "IPR029546", "Domain_Name": "Astrocytic phosphoprotein PEA-15, death effector domain", "Domain_Function": "MAPK cascade, regulation of apoptotic process"}, {"Accession": "IPR007641", "Domain_Name": "RNA polymerase Rpb2, domain 7", "Domain_Function": "DNA binding, DNA-directed RNA polymerase activity, DNA-templated transcription"}, {"Accession": "IPR012562", "Domain_Name": "GUCT", "Domain_Function": "RNA binding, helicase activity, ATP binding"}, {"Accession": "IPR000121", "Domain_Name": "PEP-utilising enzyme, C-terminal", "Domain_Function": "transferase activity, transferring phosphorus-containing groups, phosphorylation"}, {"Accession": "IPR055728", "Domain_Name": "Domain of unknown function DUF7304", "Domain_Function": ""}, {"Accession": "IPR010407", "Domain_Name": "Signaling lymphocytic activation molecule, N-terminal", "Domain_Function": "signaling receptor activity, lymphocyte activation, cell surface, membrane"}, {"Accession": "IPR035827", "Domain_Name": "TRIM22, PRY/SPRY domain", "Domain_Function": ""}, {"Accession": "IPR030385", "Domain_Name": "IRG-type guanine nucleotide-binding (G) domain", "Domain_Function": "GTP binding"}, {"Accession": "IPR062941", "Domain_Name": "TssC/VipB-like, C-terminal domain", "Domain_Function": ""}, {"Accession": "IPR047439", "Domain_Name": "Nuclear SET domain-containing protein 2, second PHD finger", "Domain_Function": ""}, {"Accession": "IPR045498", "Domain_Name": "HflX, C-terminal domain", "Domain_Function": ""}, {"Accession": "IPR004399", "Domain_Name": "Hydroxymethylpyrimidine kinase/phosphomethylpyrimidine kinase domain", "Domain_Function": "phosphomethylpyrimidine kinase activity, thiamine biosynthetic process"}, {"Accession": "IPR005324", "Domain_Name": "Small ribosomal subunit protein uS5, C-terminal", "Domain_Function": "structural constituent of ribosome, translation, ribosome"}, {"Accession": "IPR007109", "Domain_Name": "Brix domain", "Domain_Function": "rRNA binding, rRNA processing"}, {"Accession": "IPR060413", "Domain_Name": "Transcription factor KpeA/SAT20-like, C-terminal domain", "Domain_Function": ""}, {"Accession": "IPR012317", "Domain_Name": "Poly(ADP-ribose) polymerase, catalytic domain", "Domain_Function": "NAD+ poly-ADP-ribosyltransferase activity"}, {"Accession": "IPR012561", "Domain_Name": "Ferlin B-domain", "Domain_Function": "membrane"}, {"Accession": "IPR034079", "Domain_Name": "RNA-binding protein KhpB, R3H domain", "Domain_Function": "nucleic acid binding"}, {"Accession": "IPR000818", "Domain_Name": "TEA/ATTS domain", "Domain_Function": "DNA-binding transcription factor activity, regulation of DNA-templated transcription"}, {"Accession": "IPR022635", "Domain_Name": "DNA polymerase III, beta sliding clamp, C-terminal", "Domain_Function": "DNA binding, DNA-directed DNA polymerase activity, 3'-5' exonuclease activity, DNA replication, DNA polymerase III complex"}, {"Accession": "IPR057937", "Domain_Name": "Transcription regulator HVO_2718-like, helix-turn-helix domain", "Domain_Function": ""}, {"Accession": "IPR025952", "Domain_Name": "R3H-associated N-terminal domain", "Domain_Function": ""}, {"Accession": "IPR007083", "Domain_Name": "RNA polymerase Rpb1, domain 4", "Domain_Function": "DNA binding, DNA-directed RNA polymerase activity, DNA-templated transcription"}, {"Accession": "IPR011707", "Domain_Name": "Multicopper oxidase-like, N-terminal", "Domain_Function": "copper ion binding"}, {"Accession": "IPR044698", "Domain_Name": "Vitamin K epoxide reductase-like VKOR/LOT1", "Domain_Function": "oxidoreductase activity"}, {"Accession": "IPR057209", "Domain_Name": "Domain of unknown function DUF7887", "Domain_Function": ""}, {"Accession": "IPR062091", "Domain_Name": "Hydrogenase-4 component I, C-terminal domain", "Domain_Function": ""}, {"Accession": "IPR001002", "Domain_Name": "Chitin-binding, type 1", "Domain_Function": "chitin binding"}, {"Accession": "IPR044092", "Domain_Name": "Serine/threonine-protein PRP4, catalytic domain", "Domain_Function": "protein serine/threonine kinase activity, protein phosphorylation, mRNA cis splicing, via spliceosome"}, {"Accession": "IPR048627", "Domain_Name": "Exocyst complex component Sec10-like, alpha-helical bundle", "Domain_Function": ""}, {"Accession": "IPR013086", "Domain_Name": "Sodium:neurotransmitter symporter, serotonin, N-terminal", "Domain_Function": "serotonin:sodium:chloride symporter activity, neurotransmitter transport, plasma membrane"}, {"Accession": "IPR001604", "Domain_Name": "DNA/RNA non-specific endonuclease/pyrophosphatase/phosphodiesterase domain", "Domain_Function": "nucleic acid binding, hydrolase activity, metal ion binding"}, {"Accession": "IPR048324", "Domain_Name": "ZSWIM1/3, RNaseH-like domain", "Domain_Function": ""}, {"Accession": "IPR011116", "Domain_Name": "SecA Wing/Scaffold", "Domain_Function": "protein import, membrane"}, {"Accession": "IPR062097", "Domain_Name": "GANP, MCM3AP C-terminal domain", "Domain_Function": ""}, {"Accession": "IPR001573", "Domain_Name": "A kinase-anchoring protein AKAP5 and AKAP12, calmodulin (CaM)-binding motif", "Domain_Function": "calmodulin binding"}, {"Accession": "IPR049628", "Domain_Name": "CNK1-3, SAM domain", "Domain_Function": ""}, {"Accession": "IPR020011", "Domain_Name": "FimV, C-terminal domain", "Domain_Function": ""}, {"Accession": "IPR000194", "Domain_Name": "ATPase, F1/V1/A1 complex, alpha/beta subunit, nucleotide-binding domain", "Domain_Function": "ATP binding"}, {"Accession": "IPR054534", "Domain_Name": "EST1-like, DNA-binding domain", "Domain_Function": ""}, {"Accession": "IPR034817", "Domain_Name": "hnRNP-L, RNA recognition motif 4", "Domain_Function": ""}, {"Accession": "IPR037405", "Domain_Name": "HTH-type transcriptional regulator GbpR, PBP2 domain", "Domain_Function": "regulation of DNA-templated transcription"}, {"Accession": "IPR034167", "Domain_Name": "Nab3, RNA recognition motif", "Domain_Function": "RNA binding"}, {"Accession": "IPR044734", "Domain_Name": "G protein-coupled receptor 35, 7TM", "Domain_Function": "chemokine receptor activity, chemokine-mediated signaling pathway"}, {"Accession": "IPR001605", "Domain_Name": "Pleckstrin homology domain, spectrin-type", "Domain_Function": "protein binding, phospholipid binding"}, {"Accession": "IPR002525", "Domain_Name": "Transposase IS110-like, N-terminal", "Domain_Function": "DNA binding, transposase activity, DNA transposition"}, {"Accession": "IPR033618", "Domain_Name": "Ras association domain-containing protein 2, RA domain", "Domain_Function": ""}, {"Accession": "IPR041932", "Domain_Name": "Molybdopterin oxidoreductase, predicted, betaproteobacteria", "Domain_Function": ""}, {"Accession": "IPR056889", "Domain_Name": "NET2A-D/KIP1-like, C-terminal domain", "Domain_Function": ""}, {"Accession": "IPR003148", "Domain_Name": "Regulator of K+ conductance, N-terminal lobe", "Domain_Function": "potassium ion transport"}, {"Accession": "IPR041682", "Domain_Name": "AAA domain, group 14", "Domain_Function": ""}, {"Accession": "IPR057352", "Domain_Name": "TmcB/TmcC, TPR repeats", "Domain_Function": ""}, {"Accession": "IPR008595", "Domain_Name": "Sensor DegS", "Domain_Function": "kinase activity, signal transduction"}, {"Accession": "IPR063088", "Domain_Name": "TraB family protein, C-terminal domain", "Domain_Function": ""}, {"Accession": "IPR002704", "Domain_Name": "Peptidase C7 domain", "Domain_Function": "cysteine-type endopeptidase activity, proteolysis"}, {"Accession": "IPR032355", "Domain_Name": "SATB, CUT1-like DNA-binding domain", "Domain_Function": "DNA binding"}, {"Accession": "IPR037779", "Domain_Name": "SynGAP, PH domain", "Domain_Function": "negative regulation of Ras protein signal transduction"}, {"Accession": "IPR057536", "Domain_Name": "APX 1, N-terminal C2 domain", "Domain_Function": ""}, {"Accession": "IPR032519", "Domain_Name": "YbgF, trimerisation domain", "Domain_Function": "protein trimerization"}, {"Accession": "IPR039560", "Domain_Name": "Potyviral polyprotein protein 3", "Domain_Function": ""}, {"Accession": "IPR015155", "Domain_Name": "PLAA family ubiquitin binding domain", "Domain_Function": ""}, {"Accession": "IPR007180", "Domain_Name": "Domain of unknown function DUF382", "Domain_Function": "nucleus"}, {"Accession": "IPR003439", "Domain_Name": "ABC transporter-like, ATP-binding domain", "Domain_Function": "ATP binding, ATP hydrolysis activity"}, {"Accession": "IPR005148", "Domain_Name": "Arginyl tRNA synthetase N-terminal domain", "Domain_Function": "nucleotide binding, arginine-tRNA ligase activity, ATP binding, arginyl-tRNA aminoacylation, cytoplasm"}, {"Accession": "IPR024082", "Domain_Name": "Proline dehydrogenase PutA, domain II", "Domain_Function": "L-glutamate gamma-semialdehyde dehydrogenase (NAD+) activity"}, {"Accession": "IPR006525", "Domain_Name": "Cystatin-related, plant", "Domain_Function": ""}, {"Accession": "IPR034667", "Domain_Name": "Novel protein kinase C delta, catalytic domain", "Domain_Function": "diacylglycerol-dependent serine/threonine kinase activity, protein phosphorylation"}, {"Accession": "IPR044452", "Domain_Name": "EIF2AK2, first double-stranded RNA binding domain", "Domain_Function": "double-stranded RNA binding"}, {"Accession": "IPR035508", "Domain_Name": "STAC1, SH3 domain", "Domain_Function": ""}, {"Accession": "IPR013620", "Domain_Name": "Exodeoxyribonuclease I, SH3 domain", "Domain_Function": "single-stranded DNA 3'-5' DNA exonuclease activity, DNA repair"}, {"Accession": "IPR034648", "Domain_Name": "CELF-3/4/5/6, RNA recognition motif 1", "Domain_Function": "RNA binding"}, {"Accession": "IPR059296", "Domain_Name": "Domain of unknown function DUF8252", "Domain_Function": ""}, {"Accession": "IPR012580", "Domain_Name": "NUC153", "Domain_Function": "nucleus"}, {"Accession": "IPR002130", "Domain_Name": "Cyclophilin-type peptidyl-prolyl cis-trans isomerase domain", "Domain_Function": "peptidyl-prolyl cis-trans isomerase activity, protein peptidyl-prolyl isomerization"}, {"Accession": "IPR013697", "Domain_Name": "DNA polymerase epsilon, catalytic subunit A, C-terminal", "Domain_Function": "DNA-directed DNA polymerase activity, zinc ion binding, DNA replication, nucleus"}, {"Accession": "IPR048789", "Domain_Name": "Cation channel sperm-associated protein subunit beta, C-terminal domain", "Domain_Function": ""}, {"Accession": "IPR057159", "Domain_Name": "Domain of unknown function DUF7837", "Domain_Function": ""}, {"Accession": "IPR043628", "Domain_Name": "DAZ domain", "Domain_Function": "protein binding"}, {"Accession": "IPR018993", "Domain_Name": "FGFR1 oncogene partner (FOP), N-terminal dimerisation domain", "Domain_Function": "microtubule anchoring, microtubule organizing center"}, {"Accession": "IPR047051", "Domain_Name": "TRIM32, B-box type 1 zinc finger", "Domain_Function": ""}, {"Accession": "IPR001732", "Domain_Name": "UDP-glucose/GDP-mannose dehydrogenase, N-terminal", "Domain_Function": "oxidoreductase activity, acting on the CH-OH group of donors, NAD or NADP as acceptor, NAD binding"}, {"Accession": "IPR006934", "Domain_Name": "Baculovirus ODV-E66, C-terminal domain", "Domain_Function": "viral envelope"}, {"Accession": "IPR049883", "Domain_Name": "NOTCH1, EGF-like calcium-binding domain", "Domain_Function": ""}, {"Accession": "IPR028094", "Domain_Name": "Restriction of telomere capping protein 4, C-terminal", "Domain_Function": ""}, {"Accession": "IPR033830", "Domain_Name": "Serpin H1, serpin domain", "Domain_Function": "serine-type endopeptidase inhibitor activity, collagen binding"}, {"Accession": "IPR061788", "Domain_Name": "Domain of unknown function DUF8727", "Domain_Function": ""}, {"Accession": "IPR046950", "Domain_Name": "DNA-directed RNA polymerase, C-terminal domain, phage-type", "Domain_Function": ""}, {"Accession": "IPR034591", "Domain_Name": "RBM12, RNA recognition motif 1", "Domain_Function": ""}, {"Accession": "IPR000922", "Domain_Name": "D-galactoside/L-rhamnose binding SUEL lectin domain", "Domain_Function": "carbohydrate binding"}, {"Accession": "IPR012818", "Domain_Name": "Precorrin-6Y methyltransferase", "Domain_Function": "protein methyltransferase activity, cobalamin biosynthetic process"}, {"Accession": "IPR001365", "Domain_Name": "Adenosine deaminase domain", "Domain_Function": "deaminase activity"}, {"Accession": "IPR027635", "Domain_Name": "Type 2 lantibiotic, leader peptide domain", "Domain_Function": "defense response to bacterium"}, {"Accession": "IPR057764", "Domain_Name": "Serine/threonine-protein kinase D1-3-like, ubiquitin-like domain", "Domain_Function": ""}, {"Accession": "IPR013538", "Domain_Name": "Activator of Hsp90 ATPase homologue 1/2-like, C-terminal", "Domain_Function": ""}, {"Accession": "IPR025410", "Domain_Name": "Lantibiotic biosynthesis protein, dehydration domain", "Domain_Function": ""}, {"Accession": "IPR048517", "Domain_Name": "DENR, N-terminal domain", "Domain_Function": ""}, {"Accession": "IPR034237", "Domain_Name": "FOX1, RNA recognition motif", "Domain_Function": "RNA binding"}, {"Accession": "IPR044449", "Domain_Name": "Rnt1/Pac1, double-stranded RNA binding domain, fungi", "Domain_Function": "double-stranded RNA binding, rRNA processing"}, {"Accession": "IPR048540", "Domain_Name": "Rrn7/TAF1B, N-terminal cyclin domain", "Domain_Function": ""}, {"Accession": "IPR003159", "Domain_Name": "Polysaccharide lyase family 8, central domain", "Domain_Function": "lyase activity, extracellular region"}, {"Accession": "IPR008471", "Domain_Name": "MnmC-like methyltransferase", "Domain_Function": "oxidoreductase activity, acting on the CH-NH group of donors"}, {"Accession": "IPR055372", "Domain_Name": "Carbohydrate-binding module family 96", "Domain_Function": ""}, {"Accession": "IPR019549", "Domain_Name": "Homeobox engrailed, C-terminal", "Domain_Function": ""}, {"Accession": "IPR002510", "Domain_Name": "Metalloprotease TldD/E, N-terminal domain", "Domain_Function": "proteolysis"}, {"Accession": "IPR002379", "Domain_Name": "V-ATPase proteolipid subunit C-like domain", "Domain_Function": "proton transmembrane transporter activity, proton transmembrane transport, proton-transporting two-sector ATPase complex, proton-transporting domain"}, {"Accession": "IPR042743", "Domain_Name": "Serine/threonine-protein kinase 10, catalytic domain", "Domain_Function": "protein serine/threonine kinase activity"}, {"Accession": "IPR012417", "Domain_Name": "Calmodulin-binding domain, plant", "Domain_Function": "calmodulin binding"}, {"Accession": "IPR034252", "Domain_Name": "Ephrin-A ectodomain", "Domain_Function": "ephrin receptor binding, ephrin receptor signaling pathway"}, {"Accession": "IPR028754", "Domain_Name": "Serine/threonine-protein kinase PAK5, catalytic domain", "Domain_Function": "protein serine/threonine kinase activity, apoptotic process, cytoskeleton organization"}, {"Accession": "IPR001254", "Domain_Name": "Serine proteases, trypsin domain", "Domain_Function": "serine-type endopeptidase activity, proteolysis"}, {"Accession": "IPR008858", "Domain_Name": "TROVE domain", "Domain_Function": "RNA binding"}, {"Accession": "IPR032660", "Domain_Name": "Transcription factor ATOH8, basic helix-loop-helix domain", "Domain_Function": "DNA-binding transcription factor activity"}, {"Accession": "IPR059091", "Domain_Name": "YhiD, C-terminal ACT domain", "Domain_Function": ""}, {"Accession": "IPR010560", "Domain_Name": "Neogenin, C-terminal", "Domain_Function": "membrane"}, {"Accession": "IPR003307", "Domain_Name": "W2 domain", "Domain_Function": "protein binding"}, {"Accession": "IPR007142", "Domain_Name": "Haemagglutinin-esterase glycoprotein, core", "Domain_Function": "hydrolase activity, acting on ester bonds, host cell surface receptor binding, fusion of virus membrane with host plasma membrane, viral envelope"}, {"Accession": "IPR034795", "Domain_Name": "PTBPH3, RNA recognition motif 1", "Domain_Function": ""}, {"Accession": "IPR006752", "Domain_Name": "Archaeal flagella protein FlaD/E domain", "Domain_Function": "archaeal or bacterial-type flagellum-dependent cell motility"}, {"Accession": "IPR021648", "Domain_Name": "Vacuolar protein sorting protein 36, GLUE domain", "Domain_Function": "phosphatidylinositol-3-phosphate binding, ubiquitin binding"}, {"Accession": "IPR028557", "Domain_Name": "Unconventional myosin-IXb, Rho-GAP domain", "Domain_Function": "GTPase activator activity, Rho protein signal transduction, actin filament-based movement"}, {"Accession": "IPR049340", "Domain_Name": "Outer membrane-associated lipoprotein TP0453", "Domain_Function": ""}, {"Accession": "IPR002569", "Domain_Name": "Peptide methionine sulphoxide reductase MsrA domain", "Domain_Function": "peptide-methionine (S)-S-oxide reductase activity"}, {"Accession": "IPR061276", "Domain_Name": "Afadin, PDZ domain", "Domain_Function": ""}, {"Accession": "IPR063550", "Domain_Name": "DinD, C-terminal domain", "Domain_Function": ""}, {"Accession": "IPR023602", "Domain_Name": "Riboflavin kinase domain, CTP-dependent", "Domain_Function": "phosphotransferase activity, alcohol group as acceptor"}, {"Accession": "IPR011651", "Domain_Name": "Notch ligand, N-terminal domain", "Domain_Function": "Notch signaling pathway, membrane"}, {"Accession": "IPR019017", "Domain_Name": "Signal transduction histidine kinase RcsC, alpha-beta loop, C-terminal", "Domain_Function": "protein histidine kinase activity, ATP binding, phosphorelay signal transduction system, regulation of DNA-templated transcription, peptidyl-histidine phosphorylation, plasma membrane, membrane"}, {"Accession": "IPR001054", "Domain_Name": "Adenylyl cyclase class-3/4/guanylyl cyclase", "Domain_Function": "cyclic nucleotide biosynthetic process, intracellular signal transduction"}, {"Accession": "IPR035283", "Domain_Name": "Protein Fmp23", "Domain_Function": ""}, {"Accession": "IPR001909", "Domain_Name": "Krueppel-associated box", "Domain_Function": "regulation of DNA-templated transcription"}, {"Accession": "IPR015007", "Domain_Name": "Nuclear pore complex, NUP2/50/61", "Domain_Function": "nuclear pore"}, {"Accession": "IPR003499", "Domain_Name": "Probable DNA packing protein, N-terminal", "Domain_Function": "chromosome organization"}, {"Accession": "IPR001257", "Domain_Name": "Parvovirus non-structural protein 1, helicase domain", "Domain_Function": "viral genome replication"}, {"Accession": "IPR047380", "Domain_Name": "Tudor domain-containing protein 2-like, tudor domain", "Domain_Function": ""}, {"Accession": "IPR034003", "Domain_Name": "ATP-binding cassette transporter, PDR-like subfamily G, domain 2", "Domain_Function": ""}, {"Accession": "IPR001208", "Domain_Name": "MCM domain", "Domain_Function": "DNA binding, ATP binding"}, {"Accession": "IPR010402", "Domain_Name": "CCT domain", "Domain_Function": "protein binding"}, {"Accession": "IPR047504", "Domain_Name": "F-box only protein 11, UBR-box", "Domain_Function": ""}, {"Accession": "IPR018967", "Domain_Name": "Iron-binding zinc finger, CDGSH type", "Domain_Function": "2 iron, 2 sulfur cluster binding"}, {"Accession": "IPR018774", "Domain_Name": "Bacteriophage Mu, GpT", "Domain_Function": ""}, {"Accession": "IPR009875", "Domain_Name": "PilZ domain", "Domain_Function": "cyclic-di-GMP binding"}, {"Accession": "IPR022680", "Domain_Name": "Methyl-coenzyme M reductase, beta subunit, N-terminal", "Domain_Function": "coenzyme-B sulfoethylthiotransferase activity"}, {"Accession": "IPR004821", "Domain_Name": "Cytidyltransferase-like domain", "Domain_Function": "catalytic activity"}, {"Accession": "IPR034966", "Domain_Name": "CCR4-NOT transcription complex subunit 6", "Domain_Function": "poly(A)-specific ribonuclease activity"}, {"Accession": "IPR001683", "Domain_Name": "Phox homology", "Domain_Function": "phosphatidylinositol binding"}, {"Accession": "IPR023054", "Domain_Name": "Sporulation regulator WhiA, C-terminal", "Domain_Function": ""}, {"Accession": "IPR006592", "Domain_Name": "RNA polymerase, N-terminal", "Domain_Function": "DNA binding, DNA-directed RNA polymerase activity, DNA-templated transcription"}, {"Accession": "IPR058273", "Domain_Name": "Domain of unknown function DUF7967", "Domain_Function": ""}, {"Accession": "IPR010599", "Domain_Name": "Connector enhancer of kinase suppressor of ras 2/3 domain", "Domain_Function": "regulation of signal transduction, cytoplasm, membrane"}, {"Accession": "IPR005540", "Domain_Name": "KNOX1", "Domain_Function": "DNA binding, nucleus"}, {"Accession": "IPR034673", "Domain_Name": "Maternal embryonic leucine zipper kinase, catalytic domain", "Domain_Function": "protein serine/threonine kinase activity, protein phosphorylation"}, {"Accession": "IPR012904", "Domain_Name": "8-oxoguanine DNA glycosylase, N-terminal", "Domain_Function": "damaged DNA binding, oxidized purine nucleobase lesion DNA N-glycosylase activity, nucleotide-excision repair"}, {"Accession": "IPR028011", "Domain_Name": "Domain of unknown function DUF4476", "Domain_Function": ""}, {"Accession": "IPR013215", "Domain_Name": "Cobalamin-independent methionine synthase MetE, N-terminal", "Domain_Function": "5-methyltetrahydropteroyltriglutamate-homocysteine S-methyltransferase activity, zinc ion binding, amino acid biosynthetic process"}];
 
-        const colorPalette = ['bg-red-600', 'bg-blue-600', 'bg-emerald-600', 'bg-purple-600', 'bg-orange-600', 'bg-cyan-600', 'bg-pink-600', 'bg-indigo-600', 'bg-yellow-600', 'bg-rose-600'];
+        // --- 2. Color Palette for Domains ---
+        const colors = [
+            { bg: 'bg-emerald-500', border: 'border-emerald-600', text: 'text-emerald-900' },
+            { bg: 'bg-rose-500', border: 'border-rose-600', text: 'text-rose-900' },
+            { bg: 'bg-cyan-500', border: 'border-cyan-600', text: 'text-cyan-900' },
+            { bg: 'bg-amber-500', border: 'border-amber-600', text: 'text-amber-900' },
+            { bg: 'bg-violet-500', border: 'border-violet-600', text: 'text-violet-900' },
+            { bg: 'bg-fuchsia-500', border: 'border-fuchsia-600', text: 'text-fuchsia-900' },
+            { bg: 'bg-lime-500', border: 'border-lime-600', text: 'text-lime-900' },
+            { bg: 'bg-blue-500', border: 'border-blue-600', text: 'text-blue-900' }
+        ];
 
-        // Assign colors and text classes mapping over raw data
-        const domains = rawDomains.map((d, index) => ({
-            ...d,
-            colorClass: colorPalette[index % colorPalette.length],
-            textClass: 'text-white'
-        }));
-
-        // DOM Elements
-        const libraryContainer = document.getElementById('domain-library');
-        const shuffleBtn = document.getElementById('shuffle-btn');
-        const emptyState = document.getElementById('empty-state');
-        const vizContainer = document.getElementById('protein-visualization');
-        const descContainer = document.getElementById('protein-description');
+        // --- 3. DOM Elements ---
+        const libraryContainer = document.getElementById('library-container');
+        const libraryCount = document.getElementById('library-count');
         const domainCountSlider = document.getElementById('domain-count');
         const domainCountDisplay = document.getElementById('domain-count-display');
+        const generateBtn = document.getElementById('generate-btn');
+        const visualizer = document.getElementById('protein-visualizer');
+        const emptyState = document.getElementById('empty-state');
+        const analysisContainer = document.getElementById('analysis-container');
+        const analysisEmpty = document.getElementById('analysis-empty');
 
-        // Render the Domain Library Legend
-        function renderLibrary() {
-            domains.forEach(domain => {
-                const card = document.createElement('div');
-                card.className = 'flex items-start gap-3 p-3 border border-slate-100 rounded-lg hover:bg-slate-50 transition';
-                card.innerHTML = `
-                    <div class="${domain.colorClass} w-10 h-10 rounded shadow-sm flex items-center justify-center flex-shrink-0 text-[0.6rem] leading-tight text-center font-bold ${domain.textClass} protein-block px-1 break-words">
-                        ${domain.Accession.replace('IPR', '')}
+        // --- 4. Initialize UI ---
+        function init() {
+            // Update library count
+            libraryCount.textContent = `${domainLibrary.length} total domains`;
+
+            // Populate Library View
+            domainLibrary.forEach((domain, idx) => {
+                const el = document.createElement('div');
+                el.className = 'py-2 px-3 hover:bg-indigo-50 border-b border-slate-100 last:border-0 transition-colors';
+                el.innerHTML = `
+                    <div class="flex items-baseline justify-between mb-1">
+                        <span class="text-xs font-bold text-indigo-700 mono-text">${domain.Accession}</span>
                     </div>
-                    <div class="overflow-hidden">
-                        <h4 class="text-sm font-bold text-slate-800 truncate" title="${domain.Domain_Name}">${domain.Domain_Name}</h4>
-                        <p class="text-xs text-slate-500 mt-0.5">${domain.Accession}</p>
-                    </div>
+                    <p class="text-sm font-medium text-slate-800 line-clamp-1" title="${domain.Domain_Name}">${domain.Domain_Name}</p>
+                    <p class="text-xs text-slate-500 line-clamp-1 italic mt-0.5" title="${domain.Domain_Function}">${domain.Domain_Function || 'Unknown function'}</p>
                 `;
-                libraryContainer.appendChild(card);
+                libraryContainer.appendChild(el);
             });
+
+            // Slider Listener
+            domainCountSlider.addEventListener('input', (e) => {
+                domainCountDisplay.textContent = e.target.value;
+            });
+
+            // Generate Listener
+            generateBtn.addEventListener('click', shuffleAndGenerate);
         }
 
-        // Generate a random protein sequence based on slider value
-        function generateSequence() {
-            const length = parseInt(domainCountSlider.value, 10);
-            const sequence = [];
+        // --- 5. Core Logic: Shuffle & Generate ---
+        function shuffleAndGenerate() {
+            const numDomains = parseInt(domainCountSlider.value, 10);
             
-            for (let i = 0; i < length; i++) {
-                const randomIdx = Math.floor(Math.random() * domains.length);
-                sequence.push(domains[randomIdx]);
+            // Randomly select domains
+            const selectedDomains = [];
+            for(let i=0; i<numDomains; i++) {
+                const randomIdx = Math.floor(Math.random() * domainLibrary.length);
+                selectedDomains.push(domainLibrary[randomIdx]);
             }
-            
-            return sequence;
+
+            renderVisualization(selectedDomains);
+            generateAnalysis(selectedDomains);
         }
 
-        // Interpret biological function and localization based on heuristics
-        function generateBiologicalDescription(sequence) {
-            const names = sequence.map(d => d.Domain_Name.toLowerCase());
-            
-            // Heuristics for Localization
-            const isNucleus = names.some(n => n.includes("dna") || n.includes("zinc finger") || n.includes("chromo") || n.includes("homeodomain") || n.includes("hsf") || n.includes("rna") || n.includes("forkhead") || n.includes("pou") || n.includes("bromo"));
-            const isMembrane = names.some(n => n.includes("receptor") || n.includes("gpcr") || n.includes("barrel") || n.includes("permease") || n.includes("phox") || n.includes("pleckstrin") || n.includes("transmembrane"));
-            
-            let localization = "<strong class='text-teal-700'>Predicted Localization:</strong> Cytoplasm (soluble).";
-            if (isMembrane && isNucleus) {
-                localization = "<strong class='text-teal-700'>Predicted Localization:</strong> Dual-localized. May undergo membrane cleavage to translocate to the nucleus.";
-            } else if (isMembrane) {
-                localization = "<strong class='text-teal-700'>Predicted Localization:</strong> Cell Membrane (Integral or Peripheral).";
-            } else if (isNucleus) {
-                localization = "<strong class='text-teal-700'>Predicted Localization:</strong> Nucleus.";
-            }
-
-            // Heuristics for Function
-            const isCatalytic = names.some(n => n.includes("kinase") || n.includes("atpase") || n.includes("polymerase") || n.includes("protease") || n.includes("peptidase") || n.includes("hect") || n.includes("gtpase"));
-            const isScaffold = names.some(n => n.includes("binding") || n.includes("sh2") || n.includes("sh3") || n.includes("pdz") || n.includes("fibronectin") || n.includes("death") || n.includes("kringle") || n.includes("eh domain") || n.includes("ferm") || n.includes("btb"));
-            
-            let functionDesc = "<strong class='text-teal-700'>Inferred Function:</strong> This novel protein appears to have an undefined or highly specialized structural role, potentially acting as a novel interaction node without intrinsic catalytic activity.";
-            if (isCatalytic && isScaffold) {
-                functionDesc = "<strong class='text-teal-700'>Inferred Function:</strong> This protein likely acts as an active signaling node, utilizing its scaffolding/interaction domains to localize its enzymatic (catalytic) activity to highly specific cellular substrates or complexes.";
-            } else if (isCatalytic) {
-                functionDesc = "<strong class='text-teal-700'>Inferred Function:</strong> This protein primarily functions as a catalyst. Driven by its enzymatic domains, it modulates cellular states via biochemical reactions like phosphorylation, proteolysis, or ATP/GTP hydrolysis.";
-            } else if (isScaffold) {
-                functionDesc = "<strong class='text-teal-700'>Inferred Function:</strong> This protein acts primarily as an adaptor or structural scaffold, mediating protein-protein or protein-ligand interactions to assemble multi-molecular complexes.";
-            }
-
-            let paragraph = `<h3 class="text-lg font-extrabold text-slate-800 mb-3 border-b border-teal-200 pb-2">Chimeric Protein Overview</h3>`;
-            paragraph += `<p class="mb-3 text-sm leading-relaxed">${localization}</p>`;
-            paragraph += `<p class="mb-3 text-sm leading-relaxed">${functionDesc}</p>`;
-            paragraph += `<div class="mt-4 pt-3 border-t border-teal-100"><p class="text-xs text-slate-500 leading-relaxed"><strong>Composition (${sequence.length} exons):</strong> ${sequence.map(s => `<span class="italic text-slate-600">${s.Domain_Name}</span>`).join(' &rarr; ')}</p></div>`;
-
-            return paragraph;
-        }
-
-        // Render the sequence visually
-        function renderVisualization(sequence) {
+        // --- 6. Rendering Visualization ---
+        function renderVisualization(domains) {
             emptyState.classList.add('hidden');
-            vizContainer.classList.remove('hidden');
-            vizContainer.innerHTML = '';
-            
-            // N-Terminus
-            const nTerm = document.createElement('div');
-            nTerm.className = 'text-xs text-slate-400 font-bold mr-2';
-            nTerm.innerText = 'N-term';
-            vizContainer.appendChild(nTerm);
+            visualizer.classList.remove('hidden');
+            visualizer.classList.add('flex');
+            visualizer.innerHTML = '';
 
-            sequence.forEach((domain, index) => {
-                // Domain Block
-                const block = document.createElement('div');
-                block.className = `${domain.colorClass} ${domain.textClass} protein-block h-20 w-28 sm:w-36 flex flex-col items-center justify-center rounded-lg shadow-md relative group m-1`;
+            // N-Terminus label
+            visualizer.innerHTML += `<div class="text-xs font-bold text-slate-400 mr-2 flex flex-col items-center justify-center"><span>N</span><span>|</span></div>`;
+
+            domains.forEach((domain, index) => {
+                const color = colors[index % colors.length];
                 
-                // Content
+                const block = document.createElement('div');
+                block.className = `domain-block flex flex-col items-center justify-center w-28 h-28 sm:w-32 sm:h-32 rounded-xl shadow-md border-2 ${color.border} ${color.bg} text-white p-2 relative`;
+                block.style.animationDelay = `${index * 0.1}s`;
+                
                 block.innerHTML = `
-                    <span class="font-bold text-xs truncate w-full px-2 text-center">${domain.Accession}</span>
-                    <span class="text-[0.65rem] opacity-90 mt-1 px-2 text-center line-clamp-2 w-full leading-tight" title="${domain.Domain_Name}">${domain.Domain_Name}</span>
+                    <span class="bg-black/20 px-2 py-0.5 rounded text-[0.65rem] font-bold tracking-wider mb-2 mono-text">${domain.Accession}</span>
+                    <span class="text-xs font-semibold text-center leading-tight line-clamp-3 w-full">${domain.Domain_Name}</span>
                 `;
-                vizContainer.appendChild(block);
+                
+                visualizer.appendChild(block);
 
-                // Connection line (if not last)
-                if (index < sequence.length - 1) {
-                    const line = document.createElement('div');
-                    line.className = 'connection-line my-auto flex-shrink-0';
-                    vizContainer.appendChild(line);
+                // Add linker if not the last item
+                if (index < domains.length - 1) {
+                    const linker = document.createElement('div');
+                    linker.className = 'w-4 sm:w-8 h-1.5 bg-slate-300 rounded-full mx-1';
+                    visualizer.appendChild(linker);
                 }
             });
 
-            // C-Terminus
-            const cTerm = document.createElement('div');
-            cTerm.className = 'text-xs text-slate-400 font-bold ml-2';
-            cTerm.innerText = 'C-term';
-            vizContainer.appendChild(cTerm);
+            // C-Terminus label
+            visualizer.innerHTML += `<div class="text-xs font-bold text-slate-400 ml-2 flex flex-col items-center justify-center"><span>|</span><span>C</span></div>`;
         }
 
-        // Handle the shuffle action
-        function handleShuffle() {
-            shuffleBtn.disabled = true;
-            shuffleBtn.innerHTML = 'Synthesizing...';
-            shuffleBtn.classList.add('opacity-75');
+        // --- 7. Heuristic Analysis Engine ---
+        function generateAnalysis(domains) {
+            analysisEmpty.classList.add('hidden');
+            analysisContainer.classList.remove('hidden');
+            analysisContainer.classList.add('flex');
 
-            setTimeout(() => {
-                const newSequence = generateSequence();
-                renderVisualization(newSequence);
-                
-                descContainer.innerHTML = generateBiologicalDescription(newSequence);
-                descContainer.classList.remove('hidden');
-
-                // Reset button
-                shuffleBtn.disabled = false;
-                shuffleBtn.innerHTML = 'Shuffle & Generate Protein';
-                shuffleBtn.classList.remove('opacity-75');
-            }, 300);
-        }
-
-        // Initialization
-        window.addEventListener('DOMContentLoaded', () => {
-            renderLibrary();
-            shuffleBtn.addEventListener('click', handleShuffle);
+            // Collect all text to search for keywords
+            const allText = domains.map(d => `${d.Domain_Name} ${d.Domain_Function}`).join(" ").toLowerCase();
             
-            // Slider update event
-            domainCountSlider.addEventListener('input', (e) => {
-                domainCountDisplay.innerText = e.target.value;
-            });
-        });
+            // 1. Determine likely localization
+            let localization = "Cytoplasm";
+            let locReason = "default cytoplasmic retention";
+            
+            if (/membrane|transmembrane|receptor|channel|surface|envelope/i.test(allText)) {
+                localization = "Cell Membrane";
+                locReason = "the presence of membrane-spanning or receptor domains";
+            } else if (/dna|zinc finger|transcription|nuclear|chromatin|helicase|histone/i.test(allText)) {
+                localization = "Nucleus";
+                locReason = "the presence of DNA-binding or transcriptional regulation motifs";
+            } else if (/secreted|extracellular/i.test(allText)) {
+                localization = "Extracellular Space";
+                locReason = "exhibiting features typical of secreted signaling molecules";
+            } else if (/mitochondria|cytochrome/i.test(allText)) {
+                localization = "Mitochondria";
+                locReason = "metabolic domains linked to mitochondrial function";
+            }
 
+            // 2. Determine generalized functions
+            let hasEnzymatic = /kinase|phosphatase|catalytic|peptidase|hydrolase|reductase|transferase/i.test(allText);
+            let hasBinding = /binding|interaction|receptor|adhesion/i.test(allText);
+            
+            let holisticRole = "a multifunctional scaffolding node, integrating diverse intracellular pathways.";
+            if (localization === "Nucleus" && hasEnzymatic) {
+                holisticRole = "an active chromatin-modifying enzyme, directly coupling signaling to gene expression.";
+            } else if (localization === "Nucleus") {
+                holisticRole = "a complex nuclear factor, orchestrating transcriptional regulation via modular binding.";
+            } else if (localization === "Cell Membrane" && hasEnzymatic) {
+                holisticRole = "a sophisticated membrane-bound transducer, translating extracellular cues into internal catalytic responses (e.g., phosphorylation cascades).";
+            } else if (localization === "Cell Membrane") {
+                holisticRole = "a cell-surface receptor or channel, facilitating structural anchoring or molecular transport.";
+            } else if (hasEnzymatic) {
+                holisticRole = "a highly specialized cytoplasmic enzyme, driving metabolic fluxes through its clustered catalytic regions.";
+            }
+
+            // 3. Build HTML Output
+            let html = `
+                <div class="mb-6">
+                    <h3 class="text-xl font-extrabold text-slate-800 mb-2">Protein Overview</h3>
+                    <p class="text-sm leading-relaxed">
+                        This evolutionary simulation has synthesized a completely novel chimeric protein composed of <strong>${domains.length}</strong> distinct exons. Based on structural heuristics, this macromolecule is predicted to localize primarily to the <strong class="text-indigo-600">${localization}</strong>, driven by ${locReason}. 
+                        Ultimately, the fusion of these modules implies the protein acts as <strong>${holisticRole}</strong>
+                    </p>
+                </div>
+                
+                <h4 class="text-sm font-bold text-slate-500 uppercase tracking-wide mb-3 border-b border-slate-100 pb-1">Domain-by-Domain Breakdown</h4>
+                <ul class="space-y-4 flex-grow overflow-y-auto custom-scroll pr-2">
+            `;
+
+            domains.forEach((d, idx) => {
+                let position = idx === 0 ? "N-Terminal" : (idx === domains.length - 1 ? "C-Terminal" : "Internal");
+                let fText = d.Domain_Function;
+                
+                // Fallback guessing if empty
+                if (!fText) {
+                    let name = d.Domain_Name.toLowerCase();
+                    if (name.includes('kinase')) fText = "likely phosphorylates target substrates";
+                    else if (name.includes('binding')) fText = "facilitates key molecular docking or scaffolding";
+                    else if (name.includes('domain')) fText = "provides structural stability or an unknown interaction interface";
+                    else fText = "contributes an undefined regulatory or structural capability";
+                }
+
+                html += `
+                    <li class="flex gap-4 items-start">
+                        <div class="mt-1 flex-shrink-0">
+                            <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-indigo-100 text-indigo-700 text-xs font-bold">${idx + 1}</span>
+                        </div>
+                        <div>
+                            <p class="text-sm font-bold text-slate-800"><span class="text-indigo-600">${position}:</span> ${d.Domain_Name} <span class="text-xs font-normal text-slate-400 mono-text ml-1">(${d.Accession})</span></p>
+                            <p class="text-sm text-slate-600 mt-1 capitalize-first">${fText}.</p>
+                        </div>
+                    </li>
+                `;
+            });
+
+            html += `</ul>`;
+            
+            // Add custom style for capitalizing first letter of dynamic text
+            html += `<style>.capitalize-first::first-letter { text-transform: uppercase; }</style>`;
+
+            analysisContainer.innerHTML = html;
+        }
+
+        // Boot
+        window.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
 </html>
