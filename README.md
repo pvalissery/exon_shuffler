@@ -12,8 +12,8 @@ First, I wrote a Python scraper to pull domain data from InterPro, mapping them 
 
 - **Interactive Shuffling** : Slider-controlled generation of chimeric proteins containing 2 to 10 distinct domains.
 - **Curated Domain Library** : Runs completely in the browser using a bundled JSON dataset of protein domains and their associated biological functions.
-- **Heuristic Function Prediction **: Procedurally generates natural language descriptions of what the resulting chimera might actually do in a cell based on keyword analysis of its constituent parts.
-- **Zero Dependencies **: Built entirely with vanilla JavaScript and Tailwind CSS. No backend or database required. However, you can choose to use the included Python script to pull more domains from InterPro or plug in domains of your choice. 
+- **Heuristic Function Prediction** : Procedurally generates natural language descriptions of what the resulting chimera might actually do in a cell based on keyword analysis of its constituent parts.
+- **Zero Dependencies** : Built entirely with vanilla JavaScript and Tailwind CSS. No backend or database required. However, you can choose to use the included Python script to pull more domains from InterPro or plug in domains of your choice. 
 
 **What's Next:** Directed Evolution
 
