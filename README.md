@@ -17,6 +17,6 @@ First, I wrote a Python scraper to pull domain data from InterPro, mapping them 
 
 **What's Next:** Directed Evolution
 
-I am currently building a much more elaborate tool tailored for directed evolution. Instead of relying on random recombination, the focus is on targeted, industrial application-driven design.
+I plan to build a much more elaborate tool tailored for directed evolution. Instead of relying on random recombination, the focus is on targeted, industrial application-driven design.
 
 You will be able to define a specific commercial or therapeutic use-case such as a highly stable industrial enzyme, a novel biosensor, or a specialized therapeutic and the tool will leverage a custom-built LLM to generate custom protein building blocks optimized for that exact niche. The platform will then map these domains together and output the codon-optimized nucleotide sequences required for scalable expression in standard heterologous biomanufacturing systems. Ultimately, the goal is to bridge the gap between prompt-driven design and commercial production, giving researchers a streamlined pipeline for rapid protein prototyping.
