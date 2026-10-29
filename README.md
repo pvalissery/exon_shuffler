@@ -1,4 +1,4 @@
-**Exon** **Shuffler**
+ ${\color{gold}**Exon** **Shuffler**}$
 
 https://pvalissery.github.io/exon_shuffler/
 
